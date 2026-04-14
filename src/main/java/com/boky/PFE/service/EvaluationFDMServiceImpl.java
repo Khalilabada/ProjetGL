@@ -1,37 +1,54 @@
 package com.boky.PFE.service;
 
-import com.boky.PFE.Beans.SaveEvaluation;
 import com.boky.PFE.Beans.SaveEvaluationFDM;
-import com.boky.PFE.entite.Annonce;
-import com.boky.PFE.entite.Evaluation;
 import com.boky.PFE.entite.EvaluationFDM;
 import com.boky.PFE.entite.Utilisateur;
+import com.boky.PFE.factory.ServiceFactory;
+import com.boky.PFE.factory.evaluation.IEvaluation;
 import com.boky.PFE.repository.EvaluationFDMRepository;
-import com.boky.PFE.repository.EvaluationRepositrory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
 @Service
-public class EvaluationFDMServiceImpl implements EvaluationFDMService
-{
+public class EvaluationFDMServiceImpl implements EvaluationFDMService {
+
+
+    private final ServiceFactory factory;
+
+    @Autowired
+    public EvaluationFDMServiceImpl(@Qualifier("nettoyageFactory") ServiceFactory factory) {
+        this.factory = factory;
+    }
+
     @Autowired
     EvaluationFDMRepository evaluationFDMRepository;
     @Autowired
     UtilisateurService utilisateurService;
-
     @Autowired
     EmailService emailService;
+
     @Override
-    public EvaluationFDM AjouterEvaluationFDM(SaveEvaluationFDM model){
-        EvaluationFDM evaluation = SaveEvaluationFDM.toEntity(model);
+    public EvaluationFDM AjouterEvaluationFDM(SaveEvaluationFDM model) {
+
+        IEvaluation iEvaluation = factory.creerEvaluation();
+
+        System.out.println("[Factory] Évaluation créée via NettoyageFactory — type: " + iEvaluation.getType());
+
+
+        EvaluationFDM evaluation = (EvaluationFDM) iEvaluation;
+        evaluation.setId(model.getId());
+        evaluation.setStar(model.getStar());
+        evaluation.setDate(model.getDate());
+
         Optional<Utilisateur> fdm = utilisateurService.getUtilisateurById(model.getId_FDM());
         Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_utilisateur());
 
         if (fdm.isPresent() && utilisateur.isPresent()) {
-
             evaluation.setFdm(fdm.get());
             evaluation.setUtilisateur(utilisateur.get());
             emailService.SendSimpleMessage(
@@ -43,11 +60,10 @@ public class EvaluationFDMServiceImpl implements EvaluationFDMService
                             "Cordialement,\n" +
                             "L'équipe de gestion des services"
             );
-
-            return evaluationFDMRepository.save(evaluation);}
-        else{
-            return null;}
-
+            return evaluationFDMRepository.save(evaluation);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -56,42 +72,46 @@ public class EvaluationFDMServiceImpl implements EvaluationFDMService
     }
 
     @Override
-    public     List<EvaluationFDM> listeEvaluationFDMByUtilisateur(Long id ) {
+    public List<EvaluationFDM> listeEvaluationFDMByUtilisateur(Long id) {
         return evaluationFDMRepository.findByutilisateurId(id);
     }
 
     @Override
     public Utilisateur UtilisateurByEvaluationFDM(Long id) {
-        Optional<EvaluationFDM> evaluation =  evaluationFDMRepository.findById(id);
+        Optional<EvaluationFDM> evaluation = evaluationFDMRepository.findById(id);
         return evaluation.get().getUtilisateur();
     }
+
     @Override
     public Utilisateur FDMByEvaluationFDM(Long id) {
-        Optional<EvaluationFDM> evaluation =  evaluationFDMRepository.findById(id);
+        Optional<EvaluationFDM> evaluation = evaluationFDMRepository.findById(id);
         return evaluation.get().getFdm();
     }
 
     @Override
     public EvaluationFDM ModifierEvaluationFDM(EvaluationFDM evaluation) {
-
         Utilisateur utilisateur = this.UtilisateurByEvaluationFDM(evaluation.getId());
         Utilisateur fdm = this.FDMByEvaluationFDM(evaluation.getId());
         evaluation.setUtilisateur(utilisateur);
         evaluation.setFdm(fdm);
         return evaluationFDMRepository.save(evaluation);
     }
+
     @Override
     public Optional<EvaluationFDM> getEvaluationFDMById(Long id) {
         return evaluationFDMRepository.findById(id);
     }
+
     @Override
-    public void SupprimerEvaluationFDM( Long id) {
+    public void SupprimerEvaluationFDM(Long id) {
         evaluationFDMRepository.deleteById(id);
     }
+
     @Override
-    public List<EvaluationFDM> listEvaluationFDMByfdm( Long id) {
+    public List<EvaluationFDM> listEvaluationFDMByfdm(Long id) {
         return evaluationFDMRepository.findByfdmId(id);
     }
+
     @Override
     @Transactional
     public void supprimerEvaluationFDMParFDM(Long Id) {

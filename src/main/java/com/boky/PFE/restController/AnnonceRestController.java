@@ -1,7 +1,7 @@
 package com.boky.PFE.restController;
 
 import com.boky.PFE.entite.Annonce;
-import com.boky.PFE.entite.Reservation;
+
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.service.AnnonceService;
 import com.boky.PFE.service.EmailUtilisateurService;

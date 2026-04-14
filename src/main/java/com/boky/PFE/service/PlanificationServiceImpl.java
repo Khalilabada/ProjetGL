@@ -1,33 +1,51 @@
 package com.boky.PFE.service;
 
-import com.boky.PFE.Beans.SaveAnnonce;
 import com.boky.PFE.Beans.SavePlanification;
-import com.boky.PFE.entite.Annonce;
 import com.boky.PFE.entite.Planification;
 import com.boky.PFE.entite.Utilisateur;
+import com.boky.PFE.factory.ServiceFactory;
+import com.boky.PFE.factory.offre.Offre;
 import com.boky.PFE.repository.PlanificationRepository;
 import com.boky.PFE.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
 @Service
-public class PlanificationServiceImpl implements PlanificationService
-{
+public class PlanificationServiceImpl implements PlanificationService {
+
+    private final ServiceFactory factory;
+
+    @Autowired
+    public PlanificationServiceImpl(@Qualifier("nettoyageFactory") ServiceFactory factory) {
+        this.factory = factory;
+    }
+
     @Autowired
     PlanificationRepository planificationRepository;
     @Autowired
     UtilisateurRepository utilisateurRepository;
+
     @Override
-    public Planification AjouterPlanification (SavePlanification model)    {
-        Planification planification= SavePlanification.toEntity(model);
-        System.out.println("idFDM"+model.getId_fdm());
-        Utilisateur utilisateur=utilisateurRepository.findById(model.getId_fdm()).get();
+    public Planification AjouterPlanification(SavePlanification model) {
+        Offre offre = factory.creerOffre();
+
+        System.out.println("[Factory] Offre créée via NettoyageFactory — type: " + offre.getType());
+
+        Planification planification = (Planification) offre;
+        planification.setId(model.getId());
+        planification.setHeureDisponible(model.getHeureDisponible());
+        planification.setJour(model.getJour());
+        planification.setAdresse(model.getAdresse());
+        planification.setPrixParHeure(model.getPrixParHeure());
+        planification.setGouvernorat(model.getGouvernorat());
+
+        System.out.println("idFDM" + model.getId_fdm());
+        Utilisateur utilisateur = utilisateurRepository.findById(model.getId_fdm()).get();
         planification.setFdm(utilisateur);
         return planificationRepository.save(planification);
     }
@@ -53,13 +71,15 @@ public class PlanificationServiceImpl implements PlanificationService
     public Optional<Planification> getPlanificationById(Long id) {
         return planificationRepository.findById(id);
     }
-@Override
+
+    @Override
     public List<Planification> listePlanificationByFdm(Long id) {
         return planificationRepository.findByFdmId(id);
     }
-@Override
-    public Utilisateur FdmByPlanning(  Long id) {
-        Optional<Planification> planification =  planificationRepository.findById(id);
+
+    @Override
+    public Utilisateur FdmByPlanning(Long id) {
+        Optional<Planification> planification = planificationRepository.findById(id);
         return planification.get().getFdm();
     }
 }
