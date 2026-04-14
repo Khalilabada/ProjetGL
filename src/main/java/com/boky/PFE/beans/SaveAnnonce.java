@@ -1,63 +1,63 @@
 package com.boky.PFE.Beans;
 
 import com.boky.PFE.entite.Annonce;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 
-public class SaveAnnonce
-{
-    private Long id ;
+import java.util.List;
+
+public class SaveAnnonce {
+    private Long id;
     private String type_d_hebergement;
     private int nb_voyageur;
     private int nb_chamber;
     private int nb_lits;
     private int nb_salles;
-    private String equipement;
-    private String equipement_specail;
-    private String equipement_securite;
-    private String image ;
-    private String titre ;
+    private List<String> equipement; 
+
+    @ElementCollection
+    private List<String> equipement_specail;
+
+    @ElementCollection
+    private List<String> equipement_securite;
+    @ElementCollection
+    @Column(name = "image", columnDefinition = "LONGTEXT")
+    private List<String> image;
+    private String titre;
     private String description;
-    private String mode_de_confirmation;
-    private String frais_de_service;
+
+
     private boolean reduction_semaine;
     private boolean reduction_mois;
     private float prix;
     private String pays;
-    private String etat;
-    private String libelle_de_voie;
+    private boolean etat;
+    private String ville;
     private String code_postale;
     private String heure_depart;
     private String heure_arriver;
+    private String date;
+    private boolean verification;
+    private boolean accorde_user;
     private long id_annonceur;
-    public static Annonce toEntity(SaveAnnonce model)
-    {
-        if(model == null)
-        {
-            return null ;
-        }
-        Annonce annonce=new Annonce();
-        annonce.setId(model.getId());
-        annonce.setType_d_hebergement(model.getType_d_hebergement());
-        annonce.setNb_voyageur(model.getNb_voyageur());
-        annonce.setNb_chamber(model.getNb_chamber());
-        annonce.setNb_lits(model.getNb_lits());
-        annonce.setNb_salles(model.getNb_salles());
-        annonce.setEquipement(model.getEquipement());
-        annonce.setEquipement_specail(model.getEquipement_specail());
-        annonce.setEquipement_securite(model.getEquipement_securite());
-        annonce.setImage(model.getImage());
-        annonce.setTitre(model.getTitre());
-        annonce.setDescription(model.getDescription());
-        annonce.setMode_de_confirmation(model.getMode_de_confirmation());
-        annonce.setFrais_de_service(model.getFrais_de_service());
-        annonce.setReduction_semaine(model.isReduction_semaine());
-        annonce.setReduction_mois(model.isReduction_mois());
-        annonce.setPrix(model.getPrix());
-        annonce.setPays(model.getPays());
-        annonce.setLibelle_de_voie(model.getLibelle_de_voie());
-        annonce.setCode_postale(model.getCode_postale());
-        annonce.setHeure_depart(model.getHeure_depart());
-        annonce.setHeure_arriver(annonce.getHeure_arriver());
-        return annonce;
+
+    
+
+
+    public boolean isAccorde_user() {
+        return accorde_user;
+    }
+
+    public void setAccorde_user(boolean accorde_user) {
+        this.accorde_user = accorde_user;
+    }
+
+    public boolean isVerification() {
+        return verification;
+    }
+
+    public void setVerification(boolean verification) {
+        this.verification = verification;
     }
 
     public Long getId() {
@@ -108,27 +108,12 @@ public class SaveAnnonce
         this.nb_salles = nb_salles;
     }
 
-    public String getEquipement() {
-        return equipement;
-    }
 
-    public void setEquipement(String equipement) {
-        this.equipement = equipement;
-    }
-
-    public String getEquipement_specail() {
-        return equipement_specail;
-    }
-
-    public void setEquipement_specail(String equipement_specail) {
-        this.equipement_specail = equipement_specail;
-    }
-
-    public String getImage() {
+    public List<String> getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(List<String> image) {
         this.image = image;
     }
 
@@ -148,21 +133,8 @@ public class SaveAnnonce
         this.description = description;
     }
 
-    public String getMode_de_confirmation() {
-        return mode_de_confirmation;
-    }
 
-    public void setMode_de_confirmation(String mode_de_confirmation) {
-        this.mode_de_confirmation = mode_de_confirmation;
-    }
 
-    public String getFrais_de_service() {
-        return frais_de_service;
-    }
-
-    public void setFrais_de_service(String frais_de_service) {
-        this.frais_de_service = frais_de_service;
-    }
 
     public boolean isReduction_semaine() {
         return reduction_semaine;
@@ -196,21 +168,14 @@ public class SaveAnnonce
         this.pays = pays;
     }
 
-    public String getEtat() {
+    public boolean isEtat() {
         return etat;
     }
 
-    public void setEtat(String etat) {
+    public void setEtat(boolean etat) {
         this.etat = etat;
     }
 
-    public String getLibelle_de_voie() {
-        return libelle_de_voie;
-    }
-
-    public void setLibelle_de_voie(String libelle_de_voie) {
-        this.libelle_de_voie = libelle_de_voie;
-    }
 
     public String getCode_postale() {
         return code_postale;
@@ -244,11 +209,45 @@ public class SaveAnnonce
         this.id_annonceur = id_annonceur;
     }
 
-    public String getEquipement_securite() {
+    public List<String> getEquipement() {
+        return equipement;
+    }
+
+    public void setEquipement(List<String> equipement) {
+        this.equipement = equipement;
+    }
+
+    public List<String> getEquipement_specail() {
+        return equipement_specail;
+    }
+
+    public void setEquipement_specail(List<String> equipement_specail) {
+        this.equipement_specail = equipement_specail;
+    }
+
+    public List<String> getEquipement_securite() {
         return equipement_securite;
     }
 
-    public void setEquipement_securite(String equipement_securite) {
+    public void setEquipement_securite(List<String> equipement_securite) {
         this.equipement_securite = equipement_securite;
     }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
+    }
 }
+
+

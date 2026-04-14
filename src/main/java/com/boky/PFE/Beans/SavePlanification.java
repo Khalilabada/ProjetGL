@@ -14,20 +14,7 @@ public class SavePlanification
     private String prixParHeure;
     private String gouvernorat;
     private long id_fdm;
-    public static Planification toEntity(SavePlanification model) {
-        if (model == null) {
-            return null;
-        }
-        Planification planification = new Planification();
-        planification.setId(model.getId());
-        planification.setHeureDisponible(model.getHeureDisponible());
-        planification.setJour(model.getJour());
-        planification.setAdresse(model.getAdresse());
-        planification.setPrixParHeure(model.getPrixParHeure());
-        planification.setGouvernorat(model.getGouvernorat());
-
-        return planification;
-    }
+   
 
     public String getGouvernorat() {
         return gouvernorat;
