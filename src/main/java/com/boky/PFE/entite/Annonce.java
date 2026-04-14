@@ -1,5 +1,6 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.factory.offre.Offre;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class Annonce {
+public class Annonce implements Offre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
@@ -263,5 +264,10 @@ public class Annonce {
 
     public void setHeure_arriver(String heure_arriver) {
         this.heure_arriver = heure_arriver;
+    }
+
+    @Override
+    public String getType() {
+        return "HEBERGEMENT";
     }
 }

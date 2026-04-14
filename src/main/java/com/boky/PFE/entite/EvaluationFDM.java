@@ -1,5 +1,6 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.factory.evaluation.IEvaluation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class EvaluationFDM
+public class EvaluationFDM implements IEvaluation
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,5 +68,10 @@ public class EvaluationFDM
 
     public void setFdm(Utilisateur fdm) {
         this.fdm = fdm;
+    }
+
+    @Override
+    public String getType() {
+        return "NETTOYAGE";
     }
 }

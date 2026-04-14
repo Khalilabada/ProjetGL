@@ -1,5 +1,6 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.factory.reservation.IReservation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.Optional;
 
 @Entity
 
-public class Reservation
+public class Reservation implements IReservation
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -169,5 +170,15 @@ public class Reservation
 
     public Reservation() {
 
+    }
+
+    @Override
+    public long getMontantPaye() {
+        return this.montant_paye;
+    }
+
+    @Override
+    public String getType() {
+        return "HEBERGEMENT";
     }
 }

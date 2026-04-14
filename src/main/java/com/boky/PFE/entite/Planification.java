@@ -1,5 +1,6 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.factory.offre.Offre;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Planification
+public class Planification implements Offre
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,5 +75,26 @@ public class Planification
 
     public void setGouvernorat(String gouvernorat) {
         this.gouvernorat = gouvernorat;
+    }
+
+    @Override
+    public String getTitre() {
+        return "Service de nettoyage - " + this.gouvernorat;
+    }
+
+  
+    @Override
+    public float getPrix() {
+        try {
+            return Float.parseFloat(this.prixParHeure);
+        } catch (NumberFormatException e) {
+            return 0f;
+        }
+    }
+
+  
+    @Override
+    public String getType() {
+        return "NETTOYAGE";
     }
 }

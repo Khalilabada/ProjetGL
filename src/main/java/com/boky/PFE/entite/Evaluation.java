@@ -1,5 +1,6 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.factory.evaluation.IEvaluation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Evaluation
+public class Evaluation implements IEvaluation
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,5 +69,10 @@ public class Evaluation
 
     public void setAnnonce(Annonce annonce) {
         this.annonce = annonce;
+    }
+
+    @Override
+    public String getType() {
+        return "HEBERGEMENT";
     }
 }
