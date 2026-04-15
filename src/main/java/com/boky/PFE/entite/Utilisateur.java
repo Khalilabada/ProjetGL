@@ -9,7 +9,8 @@ import java.util.Date;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Utilisateur
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Utilisateur
 {
 
     @Id
@@ -22,7 +23,6 @@ public class Utilisateur
     private String telephone ;
     private String adresse ;
     private String mdp ;
-    private String role;
     private boolean etat;
     private String photo ="assets/img/istockphoto-1209654046-612x612.jpg";
 
@@ -109,14 +109,6 @@ public class Utilisateur
 
     public void setDate_de_naissance(String date_de_naissance) {
         this.date_de_naissance = date_de_naissance;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public String getPhoto() {

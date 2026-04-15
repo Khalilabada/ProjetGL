@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rapport — Patron Factory Method (GenieLogiciels)</title>
+    <style>
+      :root{
+        --text:#111827;
+        --muted:#6b7280;
+        --line:#e5e7eb;
+        --codebg:#0b1020;
+        --codefg:#e5e7eb;
+        --accent:#111827;
+      }
+
+      @page { size: A4; margin: 18mm 16mm; }
+      * { box-sizing: border-box; }
+      body{
+        margin:0;
+        color:var(--text);
+        font: 11.5pt/1.55 "Segoe UI", Calibri, Arial, sans-serif;
+      }
+      main{
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 0;
+      }
+      h1,h2,h3{ line-height: 1.25; margin: 0 0 10px 0; }
+      h1{ font-size: 22pt; letter-spacing: .2px; }
+      h2{ font-size: 14.5pt; margin-top: 18px; padding-top: 6px; border-top: 1px solid var(--line); }
+      h3{ font-size: 12pt; margin-top: 14px; color: var(--accent); }
+      p{ margin: 0 0 10px 0; }
+      ul{ margin: 0 0 10px 18px; padding: 0; }
+      li{ margin: 4px 0; }
+      hr{ border:0; border-top:1px solid var(--line); margin: 14px 0; }
+      a{ color:#111827; text-decoration: underline; }
+      .muted{ color: var(--muted); }
+
+      /* Page de garde */
+      .cover{
+        page-break-after: always;
+        padding-top: 22mm;
+      }
+      .cover .meta{
+        margin-top: 16px;
+        color: var(--muted);
+      }
+      .cover .block{
+        margin-top: 18px;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+
+      /* Sommaire */
+      .toc{
+        page-break-after: always;
+      }
+      .toc ol{
+        margin: 8px 0 0 18px;
+      }
+      .toc li{
+        margin: 6px 0;
+      }
+
+      /* Tables */
+      table{
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0 12px 0;
+        font-size: 10.8pt;
+      }
+      th, td{
+        border: 1px solid var(--line);
+        padding: 7px 8px;
+        vertical-align: top;
+      }
+      th{
+        background: #f9fafb;
+        text-align: left;
+        font-weight: 600;
+      }
+
+      /* Code blocks */
+      pre{
+        margin: 10px 0 12px 0;
+        padding: 10px 12px;
+        background: var(--codebg);
+        color: var(--codefg);
+        border-radius: 10px;
+        overflow: auto;
+        font-size: 9.8pt;
+      }
+      code{ font-family: Consolas, "Cascadia Mono", "Courier New", monospace; }
+
+      /* Petits badges */
+      .badge{
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--muted);
+        font-size: 9.8pt;
+        margin-right: 6px;
+        white-space: nowrap;
+      }
+
+      /* Sauts de page ciblés */
+      .page-break{ page-break-before: always; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="cover">
+        <h1>Rapport — Patron de conception <em>Factory Method</em></h1>
+        <p class="muted">Intention, exemple de référence et application au projet</p>
+        <div class="meta">
+          <p><span class="badge">Projet</span> GenieLogiciels (Spring Boot, JPA)</p>
+          <p><span class="badge">Patron</span> Factory Method (Méthode de fabrique)</p>
+          <p><span class="badge">Date</span> 15/04/2026</p>
+        </div>
+        <div class="block">
+          <p><strong>Résumé.</strong> Ce rapport présente le patron <em>Factory Method</em> (GoF), puis montre son application dans le projet GenieLogiciels afin de centraliser et fiabiliser la création des différents types d’utilisateurs (Client, Annonceur, FemmeMenage, SousAdmin, SuperAdmin). Il inclut des tableaux de rôles, un diagramme de classes (PlantUML) et une justification des choix.</p>
+        </div>
+      </section>
+
+      <section class="toc">
+        <h2>Sommaire</h2>
+        <ol>
+          <li><a href="#intention">Intention et structure (référence théorique)</a></li>
+          <li><a href="#exemple">Exemple illustratif et sources</a></li>
+          <li><a href="#application">Application au projet GenieLogiciels</a></li>
+          <li><a href="#livrables">Livrables</a></li>
+          <li><a href="#sources">Bibliographie / Liens sources</a></li>
+        </ol>
+        <p class="muted">Remarque : les diagrammes sont fournis en PlantUML (code prêt à coller dans un rendu PlantUML).</p>
+      </section>
+
+      <section id="intention">
+        <h2>1. Intention et structure (référence théorique)</h2>
+
+        <h3>1.1 Intention du patron</h3>
+        <p><strong>Intention (GoF).</strong> Définir une interface pour créer un objet, mais laisser les sous-classes décider quelle classe concrète instancier. La <em>Factory Method</em> permet à une classe de déléguer l’instanciation à des sous-classes.</p>
+        <p><strong>Intérêts principaux.</strong></p>
+        <ul>
+          <li>Réduire le couplage en évitant des <code>new ConcreteProduct()</code> dispersés.</li>
+          <li>Centraliser les règles de création (valeurs par défaut, état initial, etc.).</li>
+          <li>Faciliter l’extension (ajout d’un nouveau type de produit sans modifier le code client de façon invasive).</li>
+        </ul>
+
+        <h3>1.2 Participants (GoF)</h3>
+        <table>
+          <thead>
+            <tr><th>Participant GoF</th><th>Rôle</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Product</strong></td><td>Type abstrait commun des objets créés</td></tr>
+            <tr><td><strong>ConcreteProduct</strong></td><td>Implémentations concrètes du produit</td></tr>
+            <tr><td><strong>Creator</strong></td><td>Déclare la <em>factory method</em> (contrat de création)</td></tr>
+            <tr><td><strong>ConcreteCreator</strong></td><td>Redéfinit la factory method pour instancier un <code>ConcreteProduct</code></td></tr>
+          </tbody>
+        </table>
+
+        <h3>1.3 Diagramme de structure (PlantUML — intention)</h3>
+        <pre><code>@startuml FactoryMethod_Structure_Intent
+skinparam classAttributeIconSize 0
+
+interface Product {
+  +operation()
+}
+
+class ConcreteProductA {
+  +operation()
+}
+class ConcreteProductB {
+  +operation()
+}
+
+abstract class Creator {
+  {abstract} +factoryMethod() : Product
+  +anOperation()
+}
+
+class ConcreteCreatorA {
+  +factoryMethod() : Product
+}
+class ConcreteCreatorB {
+  +factoryMethod() : Product
+}
+
+Product &lt;|.. ConcreteProductA
+Product &lt;|.. ConcreteProductB
+
+Creator &lt;|-- ConcreteCreatorA
+Creator &lt;|-- ConcreteCreatorB
+
+ConcreteCreatorA ..&gt; ConcreteProductA : crée
+ConcreteCreatorB ..&gt; ConcreteProductB : crée
+
+note right of Creator
+  anOperation() utilise
+  factoryMethod() sans
+  connaître la classe concrète
+end note
+@enduml</code></pre>
+        <p class="muted">Rendu : coller ce code dans l’outil PlantUML (en ligne ou plugin IDE) pour obtenir l’image du diagramme.</p>
+      </section>
+
+      <section id="exemple" class="page-break">
+        <h2>2. Exemple illustratif et sources</h2>
+
+        <h3>2.1 Source principale (ouvrage GoF)</h3>
+        <p>E. Gamma, R. Helm, R. Johnson, J. Vlissides — <em>Design Patterns: Elements of Reusable Object-Oriented Software</em>, Addison-Wesley, 1995. ISBN : <strong>978-0201633612</strong>. Le chapitre <em>Factory Method</em> décrit l’intention, la structure et les collaborations entre <code>Creator</code>/<code>ConcreteCreator</code> et <code>Product</code>/<code>ConcreteProduct</code>.</p>
+
+        <h3>2.2 Source web fiable (FR, diagrammes)</h3>
+        <p><strong>Refactoring Guru — Factory Method (FR)</strong> : <a href="https://refactoring.guru/fr/design-patterns/factory-method">https://refactoring.guru/fr/design-patterns/factory-method</a></p>
+        <p class="muted">Cette ressource fournit une explication pédagogique avec diagrammes (complément du livre GoF).</p>
+
+        <h3>2.3 Exemple illustratif (résumé en français)</h3>
+        <p><strong>Exemple classique (GoF).</strong> Un framework de documents appelle une méthode de création (<code>CreateDocument()</code>) définie dans une classe générique. Les sous-classes redéfinissent cette méthode pour créer le bon document concret (par ex. dessin vs texte), sans que le code générique dépende des classes concrètes.</p>
+      </section>
+
+      <section id="application">
+        <h2>3. Application au projet GenieLogiciels</h2>
+
+        <h3>3.1 Problème identifié (avant)</h3>
+        <p>Avant l’application du patron (et avant la refactorisation UML), la création des utilisateurs pouvait être réalisée directement via des constructeurs, ce qui dispersait la logique. De plus, une incohérence de modélisation existait : <strong><code>Utilisateur</code> et <code>Admin</code> étaient deux classes distinctes avec des attributs similaires, sans relation</strong>, entraînant duplication et maintenance difficile.</p>
+
+        <table>
+          <thead>
+            <tr><th>Problème</th><th>Avant / sans patron</th><th>Après / avec Factory Method</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Couplage</strong></td>
+              <td>Le client (contrôleur/service) connaît les classes concrètes et les constructeurs.</td>
+              <td>Le client dépend d’une fabrique abstraite et d’un type abstrait (<code>Utilisateur</code>).</td>
+            </tr>
+            <tr>
+              <td><strong>Duplication</strong></td>
+              <td>Logique de création répartie + duplication de structure <code>Utilisateur</code>/<code>Admin</code>.</td>
+              <td>Hiérarchie unifiée + création centralisée via factories.</td>
+            </tr>
+            <tr>
+              <td><strong>Évolutivité</strong></td>
+              <td>Ajouter un type implique de modifier plusieurs zones du code.</td>
+              <td>Ajouter une classe + une factory concrète + un cas dans le provider.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>3.2 Correspondance GoF ↔ notre code</h3>
+        <table>
+          <thead>
+            <tr><th>Composant (GoF)</th><th>Composant dans le projet</th><th>Rôle</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Product</strong></td><td><code>Utilisateur</code> (abstrait, racine JPA)</td><td>Type commun manipulé par le client du patron</td></tr>
+            <tr><td><strong>ConcreteProduct</strong></td><td><code>Client</code>, <code>Annonceur</code>, <code>FemmeMenage</code>, <code>SousAdmin</code>, <code>SuperAdmin</code></td><td>Sous-types concrets instanciés selon le besoin</td></tr>
+            <tr><td><strong>Creator</strong></td><td><code>UtilisateurFactory</code></td><td>Déclare <code>creerUtilisateur()</code></td></tr>
+            <tr><td><strong>ConcreteCreator</strong></td><td><code>ClientFactory</code>, <code>AnnonceurFactory</code>, <code>FemmeMenageFactory</code>, <code>SousAdminFactory</code>, <code>SuperAdminFactory</code></td><td>Instancient le bon produit concret</td></tr>
+            <tr><td><strong>Client</strong></td><td><code>UtilisateurRestController</code> + <code>UtilisateurFactoryProvider</code></td><td>Sélection de la factory selon <code>type</code> puis création</td></tr>
+          </tbody>
+        </table>
+
+        <h3>3.3 Rôle de chaque composant (projet)</h3>
+        <table>
+          <thead>
+            <tr><th>Composant</th><th>Rôle</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>Utilisateur</code></td><td><strong>Product</strong> abstrait : super-classe JPA (<code>@Inheritance(JOINED)</code>) avec attributs communs</td></tr>
+            <tr><td><code>Client</code>, <code>Annonceur</code>, <code>FemmeMenage</code>, <code>SousAdmin</code>, <code>SuperAdmin</code></td><td><strong>ConcreteProduct</strong> : types métier concrets</td></tr>
+            <tr><td><code>UtilisateurFactory</code></td><td><strong>Creator</strong> abstrait : contrat de création <code>creerUtilisateur()</code></td></tr>
+            <tr><td><code>ClientFactory</code>, …</td><td><strong>ConcreteCreator</strong> : création du sous-type correspondant + valeurs par défaut</td></tr>
+            <tr><td><code>UtilisateurFactoryProvider</code></td><td>Sélecteur : retourne la factory concrète selon <code>type</code></td></tr>
+            <tr><td><code>UtilisateurRestController</code></td><td>Client : orchestre <code>register</code>, délègue création à la fabrique</td></tr>
+            <tr><td><code>UtilisateurRequest</code></td><td>DTO : transporte les champs de saisie + <code>type</code></td></tr>
+          </tbody>
+        </table>
+
+        <h3>3.4 Diagramme de classes (PlantUML — projet)</h3>
+        <pre><code>@startuml Projet_Factory_Method_Utilisateur
+skinparam classAttributeIconSize 0
+hide empty members
+
+abstract class Utilisateur &lt;&lt;Entity&gt;&gt; {
+  id : Long
+  nom : String
+  email : String
+  mdp : String
+  etat : boolean
+}
+
+class Client
+class Annonceur
+class FemmeMenage
+class SousAdmin
+class SuperAdmin
+
+Utilisateur &lt;|-- Client
+Client &lt;|-- Annonceur
+Utilisateur &lt;|-- FemmeMenage
+Utilisateur &lt;|-- SousAdmin
+SousAdmin &lt;|-- SuperAdmin
+
+abstract class UtilisateurFactory &lt;&lt;Creator&gt;&gt; {
+  {abstract} +creerUtilisateur() : Utilisateur
+}
+
+class ClientFactory
+class AnnonceurFactory
+class FemmeMenageFactory
+class SousAdminFactory
+class SuperAdminFactory
+
+UtilisateurFactory &lt;|-- ClientFactory
+UtilisateurFactory &lt;|-- AnnonceurFactory
+UtilisateurFactory &lt;|-- FemmeMenageFactory
+UtilisateurFactory &lt;|-- SousAdminFactory
+UtilisateurFactory &lt;|-- SuperAdminFactory
+
+ClientFactory ..&gt; Client : &lt;&lt;create&gt;&gt;
+AnnonceurFactory ..&gt; Annonceur : &lt;&lt;create&gt;&gt;
+FemmeMenageFactory ..&gt; FemmeMenage : &lt;&lt;create&gt;&gt;
+SousAdminFactory ..&gt; SousAdmin : &lt;&lt;create&gt;&gt;
+SuperAdminFactory ..&gt; SuperAdmin : &lt;&lt;create&gt;&gt;
+
+class UtilisateurFactoryProvider &lt;&lt;utility&gt;&gt; {
+  {static} +getFactory(type: String) : UtilisateurFactory
+}
+
+class UtilisateurRestController &lt;&lt;REST&gt;&gt; {
+  +register(request: UtilisateurRequest)
+}
+
+UtilisateurRestController ..&gt; UtilisateurFactoryProvider
+UtilisateurFactoryProvider ..&gt; UtilisateurFactory : retourne
+@enduml</code></pre>
+
+        <h3>3.5 Identification des rôles (rédaction)</h3>
+        <ul>
+          <li><strong><code>Utilisateur</code></strong> joue le rôle de <strong>Product</strong> car les fabriques retournent ce type abstrait, permettant au client de manipuler un objet sans connaître sa classe concrète.</li>
+          <li><strong><code>ClientFactory</code>…</strong> jouent le rôle de <strong>ConcreteCreator</strong> car elles implémentent <code>creerUtilisateur()</code> et choisissent la sous-classe instanciée.</li>
+          <li><strong><code>UtilisateurFactoryProvider</code></strong> joue le rôle de sélecteur de fabrique (variante « registre ») car il centralise le choix de la factory selon <code>type</code>.</li>
+          <li><strong><code>UtilisateurRestController</code></strong> joue le rôle de client du patron : il délègue la création à la fabrique au lieu d’écrire une logique <em>if/else</em> avec des constructeurs.</li>
+        </ul>
+
+        <h3>3.6 Problème résolu (synthèse)</h3>
+        <table>
+          <thead>
+            <tr><th>Problème</th><th>Résolution apportée</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Duplication <code>Utilisateur</code>/<code>Admin</code></td><td>Unification via hiérarchie (admins comme sous-types) + création unique via factories</td></tr>
+            <tr><td>Couplage fort</td><td>Le client dépend d’abstractions (<code>Utilisateur</code>, <code>UtilisateurFactory</code>)</td></tr>
+            <tr><td>Création dispersée</td><td>Centralisation dans les classes <code>*Factory</code></td></tr>
+            <tr><td>Évolutivité</td><td>Nouveau profil : nouvelle sous-classe + nouvelle factory + ajout dans le provider</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="livrables" class="page-break">
+        <h2>4. Livrables</h2>
+        <ol>
+          <li><strong>Intention &amp; structure</strong> (diagramme PlantUML générique)</li>
+          <li><strong>Exemple illustratif</strong> + sources (GoF + Refactoring Guru)</li>
+          <li><strong>Application au projet</strong> : tableaux, diagramme PlantUML du projet, justification des rôles</li>
+          <li><strong>Conclusion</strong> : bénéfices, limites, perspectives</li>
+        </ol>
+      </section>
+
+      <section id="sources">
+        <h2>5. Bibliographie / liens sources</h2>
+        <table>
+          <thead>
+            <tr><th>Source</th><th>Référence</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Gamma et al., <em>Design Patterns</em></td>
+              <td>Addison-Wesley, 1995 — ISBN <strong>978-0201633612</strong> (chapitre <em>Factory Method</em>)</td>
+            </tr>
+            <tr>
+              <td>Refactoring Guru (FR) — Factory Method</td>
+              <td><a href="https://refactoring.guru/fr/design-patterns/factory-method">https://refactoring.guru/fr/design-patterns/factory-method</a></td>
+            </tr>
+            <tr>
+              <td>PlantUML (outil)</td>
+              <td><a href="https://plantuml.com/">https://plantuml.com/</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="muted">Note : Wikipédia peut servir de point de départ, mais ce rapport s’appuie sur des sources de référence (GoF) et une ressource reconnue (Refactoring Guru).</p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,4 +1,7 @@
 package com.boky.PFE.restController;
+import com.boky.PFE.Beans.UtilisateurRequest;
+import com.boky.PFE.factory.UtilisateurFactory;
+import com.boky.PFE.factory.UtilisateurFactoryProvider;
 import com.boky.PFE.service.*;
 import com.boky.PFE.util.NewPassword;
 import com.boky.PFE.util.UserCode;
@@ -32,8 +35,18 @@ public class UtilisateurRestController {
     EmailUtilisateurService emailUtilisateurService;
     private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     @PostMapping(value = "/register")
-    ResponseEntity<?> AjouterUtilisateur (@RequestBody Utilisateur utilisateur)
+    ResponseEntity<?> AjouterUtilisateur (@RequestBody UtilisateurRequest request)
     {
+        UtilisateurFactory factory = UtilisateurFactoryProvider.getFactory(request.getType());
+        Utilisateur utilisateur = factory.creerUtilisateur();
+        utilisateur.setNom(request.getNom());
+        utilisateur.setPrenom(request.getPrenom());
+        utilisateur.setEmail(request.getEmail());
+        utilisateur.setDate_de_naissance(request.getDate_de_naissance());
+        utilisateur.setTelephone(request.getTelephone());
+        utilisateur.setAdresse(request.getAdresse());
+        utilisateur.setMdp(request.getMdp());
+        utilisateur.setPhoto(request.getPhoto());
         return utilisateurService.AjouterUtilisateur(utilisateur);
     }
 
@@ -59,7 +72,7 @@ public class UtilisateurRestController {
 
     }
     @PostMapping("/Login")
-    public ResponseEntity<Map<String, Object>> loginUtilisateur(@RequestBody Utilisateur utilisateur) {
+    public ResponseEntity<Map<String, Object>> loginUtilisateur(@RequestBody UtilisateurRequest utilisateur) {
         System.out.println("in login-utilisateur"+utilisateur);
         HashMap<String, Object> response = new HashMap<>();
         Utilisateur userFromDB = utilisateurRepository.findUtilisateurByEmail(utilisateur.getEmail());
@@ -93,7 +106,7 @@ public class UtilisateurRestController {
                             .compact();
                 System.out.println("erreur hna");
                     response.put("token", token);
-                    response.put("role",userFromDB.getRole());
+                    response.put("role", userFromDB.getClass().getSimpleName());
                     return ResponseEntity.status(HttpStatus.OK).body(response);
 
             }
@@ -101,7 +114,7 @@ public class UtilisateurRestController {
         }
     }
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public Utilisateur ModifierUtilisateur(@RequestBody Utilisateur utilisateur, @PathVariable("id") Long id) {
+    public Utilisateur ModifierUtilisateur(@RequestBody UtilisateurRequest utilisateur, @PathVariable("id") Long id) {
         Utilisateur newUtilisateur = null;
         if (utilisateurRepository.findById(id).isPresent()) { //ken user deja mawjoud
             Utilisateur utilisateur1 = utilisateurRepository.findById(id).get();
@@ -113,7 +126,6 @@ public class UtilisateurRestController {
             var tel = utilisateur.getTelephone();
             var adresse = utilisateur.getAdresse();
             var mdp = utilisateur.getMdp();
-            var role = utilisateur.getRole();
             var photo=utilisateur.getPhoto();
             utilisateur1.setId(utilisateurId);
             utilisateur1.setNom(nom);
@@ -123,7 +135,6 @@ public class UtilisateurRestController {
             utilisateur1.setTelephone(tel);
             utilisateur1.setAdresse(adresse);
             utilisateur1.setMdp(mdp);
-            utilisateur1.setRole(role);
             utilisateur1.setPhoto(photo);
 
 
@@ -151,7 +162,7 @@ public class UtilisateurRestController {
     }
 
     @PostMapping("/checkEmail")
-    public ResponseEntity<Map<String, Object>> resetPasswordEmail(@RequestBody Utilisateur utilisateur){
+    public ResponseEntity<Map<String, Object>> resetPasswordEmail(@RequestBody UtilisateurRequest utilisateur){
         System.out.println("email ali mawjoud hawahouuuuuuuuuuu"+utilisateur.getEmail());
         HashMap<String, Object> response = new HashMap<>();
         Utilisateur user = utilisateurRepository.findUtilisateurByEmail(utilisateur.getEmail());
@@ -201,7 +212,7 @@ public class UtilisateurRestController {
         }
     }
     @RequestMapping("/send_email")
-    public ResponseEntity<Map<String, Object>> SendEmail(@RequestBody Utilisateur utilisateur){
+    public ResponseEntity<Map<String, Object>> SendEmail(@RequestBody UtilisateurRequest utilisateur){
         System.out.println("email ali mawjoud hawahouuuuuuuuuuu"+utilisateur.getEmail());
         HashMap<String, Object> response = new HashMap<>();
 
@@ -225,7 +236,7 @@ public class UtilisateurRestController {
     }
     @GetMapping("/role")
     public List<Utilisateur> getUtilisateurByRole(@RequestParam String role) {
-        return utilisateurRepository.findUtilisateurByRole(role);
+        return utilisateurService.getUtilisateurByRole(role);
     }
     @GetMapping("/email")
     public Utilisateur getUtilisateurByEmail(@RequestParam String email) {

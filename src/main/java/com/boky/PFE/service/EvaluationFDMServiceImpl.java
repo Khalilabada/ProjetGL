@@ -3,8 +3,10 @@ package com.boky.PFE.service;
 import com.boky.PFE.Beans.SaveEvaluation;
 import com.boky.PFE.Beans.SaveEvaluationFDM;
 import com.boky.PFE.entite.Annonce;
+import com.boky.PFE.entite.Client;
 import com.boky.PFE.entite.Evaluation;
 import com.boky.PFE.entite.EvaluationFDM;
+import com.boky.PFE.entite.FemmeMenage;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.EvaluationFDMRepository;
 import com.boky.PFE.repository.EvaluationRepositrory;
@@ -31,9 +33,15 @@ public class EvaluationFDMServiceImpl implements EvaluationFDMService
         Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_utilisateur());
 
         if (fdm.isPresent() && utilisateur.isPresent()) {
+            if (!(fdm.get() instanceof FemmeMenage fdmEntity)) {
+                throw new IllegalArgumentException("Le compte FDM doit etre de type FemmeMenage.");
+            }
+            if (!(utilisateur.get() instanceof Client clientEntity)) {
+                throw new IllegalArgumentException("Le compte evaluateur doit etre de type Client.");
+            }
 
-            evaluation.setFdm(fdm.get());
-            evaluation.setUtilisateur(utilisateur.get());
+            evaluation.setFdm(fdmEntity);
+            evaluation.setUtilisateur(clientEntity);
             emailService.SendSimpleMessage(
                     fdm.get().getEmail(),
                     "Nouvelle évaluation pour votre service",
@@ -61,12 +69,12 @@ public class EvaluationFDMServiceImpl implements EvaluationFDMService
     }
 
     @Override
-    public Utilisateur UtilisateurByEvaluationFDM(Long id) {
+    public Client UtilisateurByEvaluationFDM(Long id) {
         Optional<EvaluationFDM> evaluation =  evaluationFDMRepository.findById(id);
         return evaluation.get().getUtilisateur();
     }
     @Override
-    public Utilisateur FDMByEvaluationFDM(Long id) {
+    public FemmeMenage FDMByEvaluationFDM(Long id) {
         Optional<EvaluationFDM> evaluation =  evaluationFDMRepository.findById(id);
         return evaluation.get().getFdm();
     }
@@ -74,8 +82,8 @@ public class EvaluationFDMServiceImpl implements EvaluationFDMService
     @Override
     public EvaluationFDM ModifierEvaluationFDM(EvaluationFDM evaluation) {
 
-        Utilisateur utilisateur = this.UtilisateurByEvaluationFDM(evaluation.getId());
-        Utilisateur fdm = this.FDMByEvaluationFDM(evaluation.getId());
+        Client utilisateur = this.UtilisateurByEvaluationFDM(evaluation.getId());
+        FemmeMenage fdm = this.FDMByEvaluationFDM(evaluation.getId());
         evaluation.setUtilisateur(utilisateur);
         evaluation.setFdm(fdm);
         return evaluationFDMRepository.save(evaluation);

@@ -2,6 +2,8 @@ package com.boky.PFE.service;
 
 import com.boky.PFE.Beans.ReservationRQ;
 import com.boky.PFE.entite.Annonce;
+import com.boky.PFE.entite.Annonceur;
+import com.boky.PFE.entite.Client;
 import com.boky.PFE.entite.Reservation;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.ReservationRepository;
@@ -30,12 +32,15 @@ public class ReservationServiceImpl implements  ReservationService
         Reservation reservation = ReservationRQ.toEntity(model);
         Optional<Annonce> annonce = annonceService.getAnnonceById(model.getId_annonce());
         Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_client());
-        Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
+        Annonceur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
 
         if (annonce.isPresent() && utilisateur.isPresent()) {
+            if (!(utilisateur.get() instanceof Client client)) {
+                throw new IllegalArgumentException("L'utilisateur reserveur doit etre un Client.");
+            }
 
             reservation.setAnnonce(annonce.get());
-            reservation.setUtilisateur(utilisateur.get());
+            reservation.setUtilisateur(client);
             emailService.SendSimpleMessage(
                     annonceur.getEmail(),
                     "Nouvelle réservation pour votre annonce",
@@ -63,7 +68,7 @@ public class ReservationServiceImpl implements  ReservationService
     }
 
     @Override
-    public Utilisateur ClientByReservation( Long id) {
+    public Client ClientByReservation( Long id) {
         Optional<Reservation> reservation =  reservationRepository.findById(id);
         return reservation.get().getUtilisateur();
     }
@@ -76,7 +81,7 @@ public class ReservationServiceImpl implements  ReservationService
     @Override
     public Reservation ModifierReservation(Reservation reservation) {
 
-        Utilisateur client = this.ClientByReservation(reservation.getId());
+        Client client = this.ClientByReservation(reservation.getId());
         Annonce annonce = this.AnnonceByReservation(reservation.getId());
         reservation.setUtilisateur(client);
         reservation.setAnnonce(annonce);

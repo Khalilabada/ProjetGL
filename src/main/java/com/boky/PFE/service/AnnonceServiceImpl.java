@@ -1,6 +1,7 @@
 package com.boky.PFE.service;
 import com.boky.PFE.Beans.SaveAnnonce;
 import com.boky.PFE.entite.Annonce;
+import com.boky.PFE.entite.Annonceur;
 import com.boky.PFE.entite.Reservation;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.AnnonceRepository;
@@ -28,7 +29,10 @@ public class AnnonceServiceImpl implements AnnonceService
         Optional<Utilisateur> utilisateurOptional = utilisateurRepository.findById(model.getId_annonceur());
         if (utilisateurOptional.isPresent()) {
             Utilisateur utilisateur = utilisateurOptional.get();
-            annonce.setAnnonceur(utilisateur);
+            if (!(utilisateur instanceof Annonceur annonceur)) {
+                throw new IllegalArgumentException("L'utilisateur doit etre un Annonceur.");
+            }
+            annonce.setAnnonceur(annonceur);
             return annonceRepository.save(annonce);
         } else {
             // Gérer le cas où l'utilisateur n'est pas trouvé
@@ -41,7 +45,7 @@ EmailService emailService;
     @Override
     public Annonce ModifierAnnonce(Annonce annonce) {
         System.out.println("hatha annonce.getAnnonceur() "+annonce.getAnnonceur());
-        Utilisateur annonceur = this.UtilisateurByAnnonceur(annonce.getId());
+        Annonceur annonceur = this.UtilisateurByAnnonceur(annonce.getId());
         System.out.println("hatha annonceur "+annonceur);
         annonce.setAnnonceur(annonceur);
         System.out.println("hatha annonce "+annonce);
@@ -79,7 +83,7 @@ EmailService emailService;
     public List<Annonce> listeAnnonceByAnnonceur(Long id) {
         return annonceRepository.findByAnnonceurId(id);
     }
-    public Utilisateur UtilisateurByAnnonceur(  Long id) {
+    public Annonceur UtilisateurByAnnonceur(  Long id) {
         Optional<Annonce> annonce =  annonceRepository.findById(id);
         return annonce.get().getAnnonceur();
     }

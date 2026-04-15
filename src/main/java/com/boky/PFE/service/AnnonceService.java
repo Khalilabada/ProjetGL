@@ -1,8 +1,8 @@
 package com.boky.PFE.service;
 
 import com.boky.PFE.Beans.SaveAnnonce;
-import com.boky.PFE.entite.Admin;
 import com.boky.PFE.entite.Annonce;
+import com.boky.PFE.entite.Annonceur;
 import com.boky.PFE.entite.Utilisateur;
 
 import java.util.List;
@@ -17,6 +17,6 @@ public interface AnnonceService
     Optional<Annonce> getAnnonceById(Long id);
      List<Annonce> listeAnnonceByAnnonceur(Long id);
 
-    Utilisateur UtilisateurByAnnonceur(Long id);
+    Annonceur UtilisateurByAnnonceur(Long id);
 }
 

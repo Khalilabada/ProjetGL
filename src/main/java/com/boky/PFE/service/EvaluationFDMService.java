@@ -3,9 +3,10 @@ package com.boky.PFE.service;
 import com.boky.PFE.Beans.SaveEvaluation;
 import com.boky.PFE.Beans.SaveEvaluationFDM;
 import com.boky.PFE.entite.Annonce;
+import com.boky.PFE.entite.Client;
 import com.boky.PFE.entite.Evaluation;
 import com.boky.PFE.entite.EvaluationFDM;
-import com.boky.PFE.entite.Utilisateur;
+import com.boky.PFE.entite.FemmeMenage;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +18,9 @@ public interface EvaluationFDMService
     List<EvaluationFDM> listeEvaluationFDMByUtilisateur(Long id );
 
     void SupprimerEvaluationFDM( Long id);
-    Utilisateur UtilisateurByEvaluationFDM(Long id);
+    Client UtilisateurByEvaluationFDM(Long id);
 
-    Utilisateur FDMByEvaluationFDM(Long id);
+    FemmeMenage FDMByEvaluationFDM(Long id);
 
     EvaluationFDM ModifierEvaluationFDM(EvaluationFDM evaluation);
 
