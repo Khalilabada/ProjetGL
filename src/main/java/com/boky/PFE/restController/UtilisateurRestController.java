@@ -40,7 +40,7 @@ public class UtilisateurRestController {
     @Autowired
     UtilisateurService utilisateurService;
     @Autowired
-    EmailService emailService;
+    NotificationService notificationService;
     @Autowired
     EvaluationFDMService evaluationFDMService;
 
@@ -130,9 +130,7 @@ public class UtilisateurRestController {
 //mta3 yjih mail fih l etat
             utilisateur.setMdp(this.bCryptPasswordEncoder.encode(utilisateur1.getMdp()));
             if (utilisateur.isEtat() != utilisateur1.isEtat()) {
-                //ternary expression
-                String etat = utilisateur1.isEtat() ? "Bloqué" : "Accepté";
-                emailService.SendSimpleMessage(utilisateur1.getEmail(), "L'etat de votre compte", "votre compte a été " + etat);
+                notificationService.notifyAccountStateChanged(utilisateur1, utilisateur.isEtat());
             }
             utilisateur1.setEtat(utilisateur.isEtat());
             newUtilisateur = utilisateurRepository.save(utilisateur1);

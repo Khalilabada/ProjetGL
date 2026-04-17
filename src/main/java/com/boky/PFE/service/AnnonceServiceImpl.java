@@ -1,14 +1,11 @@
 package com.boky.PFE.service;
 import com.boky.PFE.Beans.SaveAnnonce;
 import com.boky.PFE.entite.Annonce;
-import com.boky.PFE.entite.Reservation;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.AnnonceRepository;
-import com.boky.PFE.repository.EvaluationRepositrory;
 import com.boky.PFE.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -36,8 +33,9 @@ public class AnnonceServiceImpl implements AnnonceService
         }
     }
 
-@Autowired
-EmailService emailService;
+    @Autowired
+    NotificationService notificationService;
+
     @Override
     public Annonce ModifierAnnonce(Annonce annonce) {
         System.out.println("hatha annonce.getAnnonceur() "+annonce.getAnnonceur());
@@ -52,11 +50,7 @@ EmailService emailService;
 
         Annonce annonce1 = annonceOptional.get();
         if (annonce1.isEtat() != annonce.isEtat() && annonce1.isVerification()) {
-            String etat = annonce.isEtat() ? "mise en ligne" : "hors ligne";
-
-            emailService.SendSimpleMessage(annonceur.getEmail(),
-                    "L'etat de votre Annonce " + annonce.getTitre(),
-                    "Votre annonce a été " + etat);
+            notificationService.notifyAnnonceStateChanged(annonceur, annonce, annonce.isEtat());
         }
         return annonceRepository.save(annonce);
     }

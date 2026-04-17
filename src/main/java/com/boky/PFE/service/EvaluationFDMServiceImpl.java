@@ -1,13 +1,9 @@
 package com.boky.PFE.service;
 
-import com.boky.PFE.Beans.SaveEvaluation;
 import com.boky.PFE.Beans.SaveEvaluationFDM;
-import com.boky.PFE.entite.Annonce;
-import com.boky.PFE.entite.Evaluation;
 import com.boky.PFE.entite.EvaluationFDM;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.EvaluationFDMRepository;
-import com.boky.PFE.repository.EvaluationRepositrory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +19,7 @@ public class EvaluationFDMServiceImpl implements EvaluationFDMService
     UtilisateurService utilisateurService;
 
     @Autowired
-    EmailService emailService;
+    NotificationService notificationService;
     @Override
     public EvaluationFDM AjouterEvaluationFDM(SaveEvaluationFDM model){
         EvaluationFDM evaluation = SaveEvaluationFDM.toEntity(model);
@@ -34,15 +30,7 @@ public class EvaluationFDMServiceImpl implements EvaluationFDMService
 
             evaluation.setFdm(fdm.get());
             evaluation.setUtilisateur(utilisateur.get());
-            emailService.SendSimpleMessage(
-                    fdm.get().getEmail(),
-                    "Nouvelle évaluation pour votre service",
-                    "Bonjour,\n\n" +
-                            "Nous vous informons qu'une nouvelle évaluation a été laissée pour votre service. " +
-                            "Veuillez consulter votre profil pour lire l'évaluation.\n\n" +
-                            "Cordialement,\n" +
-                            "L'équipe de gestion des services"
-            );
+            notificationService.notifyEvaluationFDMAdded(fdm.get());
 
             return evaluationFDMRepository.save(evaluation);}
         else{

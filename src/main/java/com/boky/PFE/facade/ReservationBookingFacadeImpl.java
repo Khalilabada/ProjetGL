@@ -18,7 +18,7 @@ public class ReservationBookingFacadeImpl implements ReservationBookingFacade {
 
     private final ReservationService reservationService;
 
-    private final EmailService emailService;
+    private final NotificationService notificationService;
 
 
     private final AnnonceService annonceService;
@@ -28,11 +28,11 @@ public class ReservationBookingFacadeImpl implements ReservationBookingFacade {
     // Injection par constructeur
     public ReservationBookingFacadeImpl(
             ReservationService reservationService,
-            EmailService emailService,
+            NotificationService notificationService,
             AnnonceService annonceService,
             UtilisateurService utilisateurService) {
         this.reservationService  = reservationService;
-        this.emailService        = emailService;
+        this.notificationService = notificationService;
         this.annonceService      = annonceService;
         this.utilisateurService  = utilisateurService;
     }
@@ -55,19 +55,10 @@ public class ReservationBookingFacadeImpl implements ReservationBookingFacade {
         Reservation reservation = reservationService.AjouterReservation(model);
 
         // Étape 3 — notification via le sous-système 2
-        Utilisateur annonceur =
-                annonceService.UtilisateurByAnnonceur(annonce.get().getId());
-        emailService.SendSimpleMessage(
-                annonceur.getEmail(),
-                "Nouvelle réservation pour votre annonce",
-                "Bonjour,\n\n"
-                        + "Nous vous informons que votre annonce \""
-                        + annonce.get().getTitre()
-                        + "\" a été réservée. "
-                        + "Veuillez consulter votre profil pour confirmer la réservation.\n\n"
-                        + "Cordialement,\n"
-                        + "L'équipe de gestion des réservations"
-        );
+        Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
+
+        /** Appel simple - le client ne connait ni le text ni le canal */
+        notificationService.notifyReservationCreated(annonceur, annonce.get(), reservation);
 
         return reservation;
     }
@@ -91,18 +82,7 @@ public class ReservationBookingFacadeImpl implements ReservationBookingFacade {
                 reservationService.ModifierReservation(reservation);
 
         // Étape 3 — notification via le sous-système 2
-        String etat = reservation.isConfirmation() ? "acceptée" : "non confirmée";
-        emailService.SendSimpleMessage(
-                client.getEmail(),
-                "Réponse concernant votre réservation de maison - " + annonce.getTitre(),
-                "Bonjour,\n\n"
-                        + "Nous vous informons que votre réservation pour la maison \""
-                        + annonce.getTitre()
-                        + "\" a été " + etat + ".\n\n"
-                        + "Merci de consulter votre profil pour plus de détails.\n\n"
-                        + "Cordialement,\n"
-                        + "L'équipe de gestion des réservations"
-        );
+        notificationService.notifyReservationResponse(client, annonce, reservation);
 
         return reservationModifiee;
     }

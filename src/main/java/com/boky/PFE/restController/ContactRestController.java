@@ -1,10 +1,9 @@
 package com.boky.PFE.restController;
 
 import com.boky.PFE.entite.Contact;
-import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.ContactRepository;
 import com.boky.PFE.service.ContactService;
-import com.boky.PFE.service.EmailService;
+import com.boky.PFE.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ public class ContactRestController
     @Autowired
     ContactService contactService;
     @Autowired
-    EmailService emailService;
+    NotificationService notificationService;
     @RequestMapping(method = RequestMethod.GET)
     public List<Contact> AfficherContact()
     {
@@ -66,13 +65,7 @@ public class ContactRestController
             contact1.setTelephone(telephone);
             contact1.setRepondre(repondre);
 
-
-
-//mta3 yjih mail fih l etat
-
-                //ternary expression
-
-                emailService.SendSimpleMessage(contact1.getEmail(),"Réponse concernant le sujet :"+contact1.getSujet() , contact1.getRepondre());
+            notificationService.notifyContactResponse(contact1);
 
 
             newContact = contactRepository.save(contact1);

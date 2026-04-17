@@ -1,10 +1,8 @@
 package com.boky.PFE.service;
 
-import com.boky.PFE.Beans.ReservationRQ;
 import com.boky.PFE.Beans.SaveEvaluation;
 import com.boky.PFE.entite.Annonce;
 import com.boky.PFE.entite.Evaluation;
-import com.boky.PFE.entite.Reservation;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.EvaluationRepositrory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,7 @@ public class EvaluationServiceImpl implements EvaluationService
     @Autowired
     UtilisateurService utilisateurService;
     @Autowired
-    EmailService emailService;
+    NotificationService notificationService;
     @Override
     public Evaluation AjouterEvaluation(SaveEvaluation model){
         Evaluation evaluation = SaveEvaluation.toEntity(model);
@@ -37,15 +35,7 @@ public class EvaluationServiceImpl implements EvaluationService
 
             evaluation.setAnnonce(annonce.get());
             evaluation.setUtilisateur(utilisateur.get());
-            emailService.SendSimpleMessage(
-                    annonceur.getEmail(),
-                    "Nouveau commentaire sur votre annonce",
-                    "Bonjour,\n\n" +
-                            "Nous vous informons qu'un nouveau commentaire a été laissé sur votre annonce \"" + annonce.get().getTitre() + "\". " +
-                            "Veuillez consulter votre profil pour lire et répondre au commentaire.\n\n" +
-                            "Cordialement,\n" +
-                            "L'équipe de gestion des annonces"
-            );
+            notificationService.notifyAnnonceCommentAdded(annonceur, annonce.get());
 
             return evaluationRepositrory.save(evaluation);}
         else{
