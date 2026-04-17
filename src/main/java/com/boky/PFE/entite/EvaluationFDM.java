@@ -1,5 +1,6 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.Beans.SaveEvaluationFDM;
 import com.boky.PFE.factory.evaluation.IEvaluation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -73,5 +74,13 @@ public class EvaluationFDM implements IEvaluation
     @Override
     public String getType() {
         return "NETTOYAGE";
+    }
+
+
+    @Override
+    public void remplirDepuisFDM(SaveEvaluationFDM model) {
+        this.setId(model.getId());
+        this.setStar(model.getStar());
+        this.setDate(model.getDate());
     }
 }

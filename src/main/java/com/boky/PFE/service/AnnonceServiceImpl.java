@@ -3,8 +3,10 @@ package com.boky.PFE.service;
 import com.boky.PFE.Beans.SaveAnnonce;
 import com.boky.PFE.entite.Annonce;
 import com.boky.PFE.entite.Utilisateur;
+import com.boky.PFE.factory.FactoryProvider;
 import com.boky.PFE.factory.ServiceFactory;
 import com.boky.PFE.factory.offre.Offre;
+import com.boky.PFE.factory.reservation.IReservation;
 import com.boky.PFE.repository.AnnonceRepository;
 import com.boky.PFE.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +18,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class AnnonceServiceImpl implements AnnonceService {
+public class AnnonceServiceImpl extends BaseService implements AnnonceService {
 
-    private final ServiceFactory factory;
-
-    @Autowired
-    public AnnonceServiceImpl(@Qualifier("hebergementFactory") ServiceFactory factory) {
-        this.factory = factory;
-    }
 
     @Autowired
     AnnonceRepository annonceRepository;
@@ -34,31 +30,10 @@ public class AnnonceServiceImpl implements AnnonceService {
 
     @Override
     public Annonce AjouterAnnonce(SaveAnnonce model) {
-        Offre offre = factory.creerOffre();
+        Offre offre = createOffre(model.getType());
+        offre.remplirDepuisRequest(model);
 
         Annonce annonce = (Annonce) offre;
-        annonce.setTitre(model.getTitre());
-        annonce.setDescription(model.getDescription());
-        annonce.setType_d_hebergement(model.getType_d_hebergement());
-        annonce.setNb_voyageur(model.getNb_voyageur());
-        annonce.setNb_chamber(model.getNb_chamber());
-        annonce.setNb_lits(model.getNb_lits());
-        annonce.setNb_salles(model.getNb_salles());
-        annonce.setEquipement(model.getEquipement());
-        annonce.setEquipement_specail(model.getEquipement_specail());
-        annonce.setEquipement_securite(model.getEquipement_securite());
-        annonce.setImage(model.getImage());
-        annonce.setReduction_semaine(model.isReduction_semaine());
-        annonce.setReduction_mois(model.isReduction_mois());
-        annonce.setPrix(model.getPrix());
-        annonce.setPays(model.getPays());
-        annonce.setVille(model.getVille());
-        annonce.setCode_postale(model.getCode_postale());
-        annonce.setHeure_depart(model.getHeure_depart());
-        annonce.setHeure_arriver(model.getHeure_arriver());
-
-        System.out.println("[Factory] Offre créée via HebergementFactory — type: " + offre.getType());
-        System.out.println("idAnnonceur: " + model.getId_annonceur());
 
         Optional<Utilisateur> utilisateurOptional = utilisateurRepository.findById(model.getId_annonceur());
         if (utilisateurOptional.isPresent()) {

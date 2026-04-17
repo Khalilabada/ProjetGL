@@ -1,5 +1,6 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.Beans.SaveEvaluation;
 import com.boky.PFE.factory.evaluation.IEvaluation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,8 @@ import java.time.format.DateTimeFormatter;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+
+
 public class Evaluation implements IEvaluation
 {
     @Id
@@ -74,5 +77,12 @@ public class Evaluation implements IEvaluation
     @Override
     public String getType() {
         return "HEBERGEMENT";
+    }
+
+    @Override
+    public void remplirDepuisRequest(SaveEvaluation model) {
+        this.setId(model.getId());
+        this.setCommentaire(model.getCommentaire());
+        this.setDate(model.getDate());
     }
 }

@@ -1,5 +1,7 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.Beans.SaveAnnonce;
+import com.boky.PFE.Beans.SavePlanification;
 import com.boky.PFE.factory.offre.Offre;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -270,4 +272,29 @@ public class Annonce implements Offre {
     public String getType() {
         return "HEBERGEMENT";
     }
+
+    @Override
+    public void remplirDepuisRequest(SaveAnnonce model) {
+        this.setTitre(model.getTitre());
+        this.setDescription(model.getDescription());
+        this.setType_d_hebergement(model.getType_d_hebergement());
+        this.setNb_voyageur(model.getNb_voyageur());
+        this.setNb_chamber(model.getNb_chamber());
+        this.setNb_lits(model.getNb_lits());
+        this.setNb_salles(model.getNb_salles());
+        this.setEquipement(model.getEquipement());
+        this.setEquipement_specail(model.getEquipement_specail());
+        this.setEquipement_securite(model.getEquipement_securite());
+        this.setImage(model.getImage());
+        this.setReduction_semaine(model.isReduction_semaine());
+        this.setReduction_mois(model.isReduction_mois());
+        this.setPrix(model.getPrix());
+        this.setPays(model.getPays());
+        this.setVille(model.getVille());
+        this.setCode_postale(model.getCode_postale());
+        this.setHeure_depart(model.getHeure_depart());
+        this.setHeure_arriver(model.getHeure_arriver());
+    }
+
+
 }

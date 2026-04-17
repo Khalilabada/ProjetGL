@@ -1,6 +1,7 @@
 package com.boky.PFE.service;
 
 import com.boky.PFE.Beans.SavePlanification;
+import com.boky.PFE.entite.Annonce;
 import com.boky.PFE.entite.Planification;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.factory.ServiceFactory;
@@ -16,14 +17,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class PlanificationServiceImpl implements PlanificationService {
+public class PlanificationServiceImpl extends BaseService implements PlanificationService {
 
-    private final ServiceFactory factory;
-
-    @Autowired
-    public PlanificationServiceImpl(@Qualifier("nettoyageFactory") ServiceFactory factory) {
-        this.factory = factory;
-    }
 
     @Autowired
     PlanificationRepository planificationRepository;
@@ -32,17 +27,10 @@ public class PlanificationServiceImpl implements PlanificationService {
 
     @Override
     public Planification AjouterPlanification(SavePlanification model) {
-        Offre offre = factory.creerOffre();
+        Offre offre = createOffre(model.getType());
 
-        System.out.println("[Factory] Offre créée via NettoyageFactory — type: " + offre.getType());
-
+        offre.remplirDepuisPlanification(model);
         Planification planification = (Planification) offre;
-        planification.setId(model.getId());
-        planification.setHeureDisponible(model.getHeureDisponible());
-        planification.setJour(model.getJour());
-        planification.setAdresse(model.getAdresse());
-        planification.setPrixParHeure(model.getPrixParHeure());
-        planification.setGouvernorat(model.getGouvernorat());
 
         System.out.println("idFDM" + model.getId_fdm());
         Utilisateur utilisateur = utilisateurRepository.findById(model.getId_fdm()).get();

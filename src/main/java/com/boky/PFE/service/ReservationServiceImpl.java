@@ -4,6 +4,7 @@ import com.boky.PFE.Beans.ReservationRQ;
 import com.boky.PFE.entite.Annonce;
 import com.boky.PFE.entite.Reservation;
 import com.boky.PFE.entite.Utilisateur;
+import com.boky.PFE.factory.FactoryProvider;
 import com.boky.PFE.factory.ServiceFactory;
 import com.boky.PFE.factory.reservation.IReservation;
 import com.boky.PFE.repository.ReservationRepository;
@@ -17,14 +18,12 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class ReservationServiceImpl implements ReservationService {
 
-    private final ServiceFactory factory;
+public class ReservationServiceImpl extends BaseService implements ReservationService {
+
 
     @Autowired
-    public ReservationServiceImpl(@Qualifier("hebergementFactory") ServiceFactory factory) {
-        this.factory = factory;
-    }
+    private FactoryProvider factoryProvider;
 
     @Autowired
     AnnonceService annonceService;
@@ -34,43 +33,26 @@ public class ReservationServiceImpl implements ReservationService {
     ReservationRepository reservationRepository;
     @Autowired
     EmailService emailService;
-
-    @Override
+@Override
     public Reservation AjouterReservation(ReservationRQ model) {
-        IReservation iReservation = factory.creerReservation();
-
-        System.out.println("[Factory] Réservation créée via HebergementFactory — type: " + iReservation.getType());
-
-        Reservation reservation = (Reservation) iReservation;
-        reservation.setId(model.getId());
-        reservation.setDate_arrivee(model.getDate_arrivee());
-        reservation.setDate_depart(model.getDate_depart());
-        reservation.setNb_nuit(model.getNb_nuit());
-        reservation.setNb_vacancier(model.getNb_vacancier());
-        reservation.setMontant_paye(model.getMontant_paye());
-        reservation.setEtat(model.isEtat());
-        reservation.setConfirmation(model.isConfirmation());
-
+    IReservation iReservation = createReservation(model.getType());
+        iReservation.remplirDepuisRequest(model);
         Optional<Annonce> annonce = annonceService.getAnnonceById(model.getId_annonce());
         Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_client());
-        Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
 
         if (annonce.isPresent() && utilisateur.isPresent()) {
+            Reservation reservation = (Reservation) iReservation;
+            
             reservation.setAnnonce(annonce.get());
             reservation.setUtilisateur(utilisateur.get());
-            emailService.SendSimpleMessage(
-                    annonceur.getEmail(),
-                    "Nouvelle réservation pour votre annonce",
-                    "Bonjour,\n\n" +
-                            "Nous vous informons que votre annonce \"" + annonce.get().getTitre() + "\" a été réservée. " +
-                            "Veuillez consulter votre profil pour confirmer la réservation.\n\n" +
-                            "Cordialement,\n" +
-                            "L'équipe de gestion des réservations"
-            );
+
+            Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
+
+            sendEmail(annonceur.getEmail(), iReservation, annonce.get().getTitre());
+
             return reservationRepository.save(reservation);
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

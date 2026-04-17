@@ -73,4 +73,10 @@ public class SavereservationFM {
     public void setId_planification(long id_planification) {
         this.id_planification = id_planification;
     }
+
+
+    public String getType() {
+        return "NETTOYAGE";
+    }
+
 }

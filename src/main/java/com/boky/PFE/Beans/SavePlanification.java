@@ -71,4 +71,7 @@ public class SavePlanification
     public void setId_fdm(long id_fdm) {
         this.id_fdm = id_fdm;
     }
+    public String getType() {
+        return "NETTOYAGE";
+    }
 }

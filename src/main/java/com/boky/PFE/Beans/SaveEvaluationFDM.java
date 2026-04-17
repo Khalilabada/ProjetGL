@@ -55,4 +55,10 @@ public class SaveEvaluationFDM
     public void setId_FDM(long id_FDM) {
         this.id_FDM = id_FDM;
     }
+
+    public String getType() {
+        return "NETTOYAGE";
+    }
+
+
 }

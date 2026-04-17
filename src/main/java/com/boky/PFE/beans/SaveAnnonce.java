@@ -13,7 +13,7 @@ public class SaveAnnonce {
     private int nb_chamber;
     private int nb_lits;
     private int nb_salles;
-    private List<String> equipement; 
+    private List<String> equipement; // Changez le type de données en List<String>
 
     @ElementCollection
     private List<String> equipement_specail;
@@ -41,7 +41,38 @@ public class SaveAnnonce {
     private boolean accorde_user;
     private long id_annonceur;
 
-    
+    public static Annonce toEntity(SaveAnnonce model) {
+        if (model == null) {
+            return null;
+        }
+        Annonce annonce = new Annonce();
+        annonce.setId(model.getId());
+        annonce.setType_d_hebergement(model.getType_d_hebergement());
+        annonce.setNb_voyageur(model.getNb_voyageur());
+        annonce.setNb_chamber(model.getNb_chamber());
+        annonce.setNb_lits(model.getNb_lits());
+        annonce.setNb_salles(model.getNb_salles());
+        annonce.setEquipement(model.getEquipement());
+        annonce.setEquipement_specail(model.getEquipement_specail());
+        annonce.setEquipement_securite(model.getEquipement_securite());
+        annonce.setImage(model.getImage());
+        annonce.setTitre(model.getTitre());
+        annonce.setDescription(model.getDescription());
+        annonce.setReduction_semaine(model.isReduction_semaine());
+        annonce.setReduction_mois(model.isReduction_mois());
+        annonce.setPrix(model.getPrix());
+        annonce.setPays(model.getPays());
+        annonce.setEtat(model.isEtat());
+        annonce.setVille(model.getVille());
+        annonce.setCode_postale(model.getCode_postale());
+        annonce.setHeure_depart(model.getHeure_depart());
+        annonce.setHeure_arriver(model.getHeure_arriver());
+        annonce.setDate(model.getDate());
+        annonce.setVerification(model.isVerification());
+        annonce.setAccorde_user(model.isAccorde_user());
+
+        return annonce;
+    }
 
 
     public boolean isAccorde_user() {
@@ -134,7 +165,9 @@ public class SaveAnnonce {
     }
 
 
-
+    public String getType() {
+        return "HEBERGEMENT";
+    }
 
     public boolean isReduction_semaine() {
         return reduction_semaine;

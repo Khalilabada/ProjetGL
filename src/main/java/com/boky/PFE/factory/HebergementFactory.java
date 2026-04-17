@@ -1,5 +1,6 @@
 package com.boky.PFE.factory;
 
+import com.boky.PFE.Beans.ReservationRQ;
 import com.boky.PFE.entite.Annonce;
 import com.boky.PFE.entite.Evaluation;
 import com.boky.PFE.entite.Reservation;
@@ -22,8 +23,11 @@ public class HebergementFactory implements ServiceFactory {
         return new Reservation();
     }
 
+
     @Override
     public IEvaluation creerEvaluation() {
         return new Evaluation();
     }
+
 }
+

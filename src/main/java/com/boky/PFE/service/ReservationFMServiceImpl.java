@@ -4,6 +4,7 @@ import com.boky.PFE.Beans.SavereservationFM;
 import com.boky.PFE.entite.Planification;
 import com.boky.PFE.entite.ReservationFM;
 import com.boky.PFE.entite.Utilisateur;
+import com.boky.PFE.factory.FactoryProvider;
 import com.boky.PFE.factory.ServiceFactory;
 import com.boky.PFE.factory.reservation.IReservation;
 import com.boky.PFE.repository.ReservationFMRepository;
@@ -17,14 +18,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class ReservationFMServiceImpl implements ReservationFMService {
-
-    private final ServiceFactory factory;
-
+public class ReservationFMServiceImpl extends BaseService implements ReservationFMService {
     @Autowired
-    public ReservationFMServiceImpl(@Qualifier("nettoyageFactory") ServiceFactory factory) {
-        this.factory = factory;
-    }
+    private FactoryProvider factoryProvider;
 
     @Autowired
     PlanificationService planificationService;
@@ -36,38 +32,25 @@ public class ReservationFMServiceImpl implements ReservationFMService {
     EmailService emailService;
 
     @Override
-    public ReservationFM AjouterReservationFM(SavereservationFM model) {
-        IReservation iReservation = factory.creerReservation();
+public ReservationFM AjouterReservationFM(SavereservationFM model) {
 
-        System.out.println("[Factory] Réservation créée via NettoyageFactory — type: " + iReservation.getType());
+        IReservation iReservation = createReservation(model.getType());
+    iReservation.remplirDepuisFM(model); 
 
-        ReservationFM reservationFM = (ReservationFM) iReservation;
-        reservationFM.setId(model.getId());
-        reservationFM.setMontant_paye(model.getMontant_paye());
-        reservationFM.setDate(model.getDate());
-        reservationFM.setEtat(model.isEtat());
-        reservationFM.setConfirmation(model.isConfirmation());
+    Optional<Planification> planification = planificationService.getPlanificationById(model.getId_planification());
+    Optional<Utilisateur> utilisateurClient = utilisateurService.getUtilisateurById(model.getId_client());
 
-        Optional<Planification> planification = planificationService.getPlanificationById(model.getId_planification());
-        Optional<Utilisateur> utilisateurClient = utilisateurService.getUtilisateurById(model.getId_client());
+    if (planification.isPresent() && utilisateurClient.isPresent()) {
+        ReservationFM res = (ReservationFM) iReservation;
+        res.setUtilisateur(utilisateurClient.get());
+        res.setPlanification(planification.get());
 
-        if (planification.isPresent() && utilisateurClient.isPresent()) {
-            reservationFM.setUtilisateur(utilisateurClient.get());
-            reservationFM.setPlanification(planification.get());
-            emailService.SendSimpleMessage(
-                    planification.get().getHeureDisponible(),
-                    "Nouvelle réservation pour votre planning",
-                    "Bonjour,\n\n" +
-                            "Nous vous informons que votre planning a été réservée. " +
-                            "Veuillez consulter votre profil pour confirmer la réservation.\n\n" +
-                            "Cordialement,\n" +
-                            "L'équipe de gestion des réservations"
-            );
-            return reservationFMRepository.save(reservationFM);
-        } else {
-            return null;
-        }
+        sendEmail(utilisateurClient.get().getEmail(), iReservation, planification.get().getJour());
+
+        return reservationFMRepository.save(res);
     }
+    return null;
+}
 
     @Override
     public List<ReservationFM> AfficherReservationFM() {

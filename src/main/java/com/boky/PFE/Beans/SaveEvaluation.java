@@ -13,8 +13,10 @@ public class SaveEvaluation
     private long id_annonce;
 
 
-   
 
+    public String getType() {
+        return "HEBERGEMENT";
+    }
     public Long getId() {
         return id;
     }

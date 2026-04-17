@@ -1,6 +1,7 @@
 package com.boky.PFE.service;
 
 import com.boky.PFE.Beans.SaveEvaluationFDM;
+import com.boky.PFE.entite.Evaluation;
 import com.boky.PFE.entite.EvaluationFDM;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.factory.ServiceFactory;
@@ -15,15 +16,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EvaluationFDMServiceImpl implements EvaluationFDMService {
+public class EvaluationFDMServiceImpl extends BaseService implements EvaluationFDMService {
 
 
-    private final ServiceFactory factory;
-
-    @Autowired
-    public EvaluationFDMServiceImpl(@Qualifier("nettoyageFactory") ServiceFactory factory) {
-        this.factory = factory;
-    }
 
     @Autowired
     EvaluationFDMRepository evaluationFDMRepository;
@@ -35,15 +30,10 @@ public class EvaluationFDMServiceImpl implements EvaluationFDMService {
     @Override
     public EvaluationFDM AjouterEvaluationFDM(SaveEvaluationFDM model) {
 
-        IEvaluation iEvaluation = factory.creerEvaluation();
 
-        System.out.println("[Factory] Évaluation créée via NettoyageFactory — type: " + iEvaluation.getType());
-
-
-        EvaluationFDM evaluation = (EvaluationFDM) iEvaluation;
-        evaluation.setId(model.getId());
-        evaluation.setStar(model.getStar());
-        evaluation.setDate(model.getDate());
+        IEvaluation eval = createEvaluation(model.getType());
+        eval.remplirDepuisFDM(model);
+        EvaluationFDM evaluation = (EvaluationFDM) eval;
 
         Optional<Utilisateur> fdm = utilisateurService.getUtilisateurById(model.getId_FDM());
         Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_utilisateur());

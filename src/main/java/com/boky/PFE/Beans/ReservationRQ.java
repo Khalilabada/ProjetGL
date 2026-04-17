@@ -109,4 +109,8 @@ public class ReservationRQ
     public void setId_annonce(long id_annonce) {
         this.id_annonce = id_annonce;
     }
+
+    public String getType() {
+        return "HEBERGEMENT";
+    }
 }

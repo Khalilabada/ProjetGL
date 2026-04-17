@@ -16,14 +16,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EvaluationServiceImpl implements EvaluationService {
+public class EvaluationServiceImpl extends BaseService implements EvaluationService {
 
-    private final ServiceFactory factory;
-
-    @Autowired
-    public EvaluationServiceImpl(@Qualifier("hebergementFactory") ServiceFactory factory) {
-        this.factory = factory;
-    }
 
     @Autowired
     EvaluationRepositrory evaluationRepositrory;
@@ -36,14 +30,9 @@ public class EvaluationServiceImpl implements EvaluationService {
 
     @Override
     public Evaluation AjouterEvaluation(SaveEvaluation model) {
-        IEvaluation iEvaluation = factory.creerEvaluation();
-
-        System.out.println("[Factory] Évaluation créée via HebergementFactory — type: " + iEvaluation.getType());
-
-        Evaluation evaluation = (Evaluation) iEvaluation;
-        evaluation.setId(model.getId());
-        evaluation.setCommentaire(model.getCommentaire());
-        evaluation.setDate(model.getDate());
+        IEvaluation eval = createEvaluation(model.getType());
+        eval.remplirDepuisRequest(model);
+        Evaluation evaluation = (Evaluation) eval;
 
         Optional<Annonce> annonce = annonceService.getAnnonceById(model.getId_annonce());
         Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_client());

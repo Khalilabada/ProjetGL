@@ -1,5 +1,7 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.Beans.SaveAnnonce;
+import com.boky.PFE.Beans.SavePlanification;
 import com.boky.PFE.factory.offre.Offre;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -96,5 +98,17 @@ public class Planification implements Offre
     @Override
     public String getType() {
         return "NETTOYAGE";
+    }
+
+
+
+    @Override
+    public void remplirDepuisPlanification(SavePlanification model) {
+        this.setId(model.getId());
+        this.setHeureDisponible(model.getHeureDisponible());
+        this.setJour(model.getJour());
+        this.setAdresse(model.getAdresse());
+        this.setPrixParHeure(model.getPrixParHeure());
+        this.setGouvernorat(model.getGouvernorat());
     }
 }
