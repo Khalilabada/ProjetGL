@@ -30,6 +30,9 @@ public class ReservationServiceImpl implements  ReservationService
         Reservation reservation = ReservationRQ.toEntity(model);
         Optional<Annonce> annonce = annonceService.getAnnonceById(model.getId_annonce());
         Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_client());
+        System.out.println("====== DEBUG ======");
+        System.out.println("ID_ANN: " + model.getId_annonce() + ", Present? " + annonce.isPresent());
+        System.out.println("ID_CLI: " + model.getId_client() + ", Present? " + utilisateur.isPresent());
         Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
 
         if (annonce.isPresent() && utilisateur.isPresent()) {
@@ -84,21 +87,16 @@ public class ReservationServiceImpl implements  ReservationService
         if (!reservationOptional.isPresent()) {
             throw new NoSuchElementException("Reservation non trouvée avec l'id: " + reservation.getId());
         }
-        reservation.setEtat(true);
 
-            String etat = reservation.isConfirmation() ? "acceptée" : "non confirmée";
+        // GRASP Expert 
+        reservation.traiter();
 
-            emailService.SendSimpleMessage(
-                    client.getEmail(),
-                    "Réponse concernant votre réservation de maison - " + annonce.getTitre(),
-                    "Bonjour,\n\n" +
-                            "Nous vous informons que votre réservation pour la maison \"" + annonce.getTitre() + "\" a été " + etat + ".\n\n" +
-                            "Merci de consulter votre profil pour plus de détails.\n\n" +
-                            "Cordialement,\n" +
-                            "L'équipe de gestion des réservations"
-            );
-
-
+        // GRASP Expert
+        emailService.SendSimpleMessage(
+                client.getEmail(),
+                reservation.getSujetNotification(),
+                reservation.getCorpsNotification()
+        );
 
         return reservationRepository.save(reservation);
     }
