@@ -51,12 +51,10 @@ EmailService emailService;
         }
 
         Annonce annonce1 = annonceOptional.get();
-        if (annonce1.isEtat() != annonce.isEtat() && annonce1.isVerification()) {
-            String etat = annonce.isEtat() ? "mise en ligne" : "hors ligne";
-
+        if (annonce1.doitNotifierChangementEtat(annonce.isEtat())) {
             emailService.SendSimpleMessage(annonceur.getEmail(),
                     "L'etat de votre Annonce " + annonce.getTitre(),
-                    "Votre annonce a été " + etat);
+                    "Votre annonce a été " + annonce1.getTexteEtat(annonce.isEtat()));
         }
         return annonceRepository.save(annonce);
     }
