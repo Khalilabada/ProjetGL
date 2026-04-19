@@ -30,7 +30,6 @@ public class ReservationServiceImpl implements ReservationService {
     @Autowired
     EmailService emailService;
     
-    // ========== PATTERN OBSERVER ==========
     private List<Object> observers = new ArrayList<>();
     
     public void attach(Object observer) {
@@ -55,7 +54,6 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
     
-    // ========== METHODES METIER ==========
     
     @Override
     public Reservation AjouterReservation(ReservationRQ model) {
@@ -71,7 +69,6 @@ public class ReservationServiceImpl implements ReservationService {
             reservation.setAnnonce(annonce.get());
             reservation.setUtilisateur(utilisateur.get());
             
-            // Envoi d'email existant (ACTION PRINCIPALE)
             emailService.SendSimpleMessage(
                     annonceur.getEmail(),
                     "Nouvelle réservation pour votre annonce",
@@ -84,7 +81,6 @@ public class ReservationServiceImpl implements ReservationService {
 
             Reservation savedReservation = reservationRepository.save(reservation);
             
-            // Notification aux observateurs (ACTIONS SECONDAIRES)
             notifyObservers();
             
             System.out.println("[ReservationService] Réservation créée avec succès. ID: " + savedReservation.getId());

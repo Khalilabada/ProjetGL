@@ -39,7 +39,6 @@ public class ReservationFMServiceImpl implements ReservationFMService {
             
             Planification planning = planificationOpt.get();
             
-            // ========== NOUVEAU CODE : Vérifier si le planning peut être réservé ==========
             if (!planning.peutReserver()) {
                 System.out.println("[State] Impossible de réserver : planning en état " + planning.getNomEtat());
                 return null;
@@ -48,7 +47,6 @@ public class ReservationFMServiceImpl implements ReservationFMService {
             reservationFM.setUtilisateur(utilisateurClient.get());
             reservationFM.setPlanification(planning);
             
-            // ========== NOUVEAU CODE : Changer l'état du planning vers RÉSERVÉ ==========
             planning.reserver();
             planificationService.ModifierPlanification(planning);
 
@@ -141,7 +139,6 @@ public class ReservationFMServiceImpl implements ReservationFMService {
         return updatedReservation;
     }
     
-    // ========== MÉTHODES POUR LE PATTERN STATE ==========
     
     public void demarrerTravail(Long planificationId) {
         System.out.println("[ReservationFMService] Démarrage du travail pour planning #" + planificationId);
