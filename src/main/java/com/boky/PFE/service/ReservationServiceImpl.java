@@ -54,26 +54,36 @@ public class ReservationServiceImpl implements ReservationService {
         }
     }
     
-    
     @Override
     public Reservation AjouterReservation(ReservationRQ model) {
         System.out.println("[ReservationService] Création d'une nouvelle réservation");
         
         Reservation reservation = ReservationRQ.toEntity(model);
-        Optional<Annonce> annonce = annonceService.getAnnonceById(model.getId_annonce());
-        Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_client());
+        Optional<Annonce> annonceOpt = annonceService.getAnnonceById(model.getId_annonce());
+        Optional<Utilisateur> utilisateurOpt = utilisateurService.getUtilisateurById(model.getId_client());
 
-        if (annonce.isPresent() && utilisateur.isPresent()) {
-            Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
+        if (annonceOpt.isPresent() && utilisateurOpt.isPresent()) {
+            Annonce annonce = annonceOpt.get();
+            Utilisateur utilisateur = utilisateurOpt.get();
+            Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.getId());
             
-            reservation.setAnnonce(annonce.get());
-            reservation.setUtilisateur(utilisateur.get());
+            reservation.setAnnonce(annonce);
+            reservation.setUtilisateur(utilisateur);
             
+            // ========== CALCUL AUTOMATIQUE DU PRIX ==========
+            int nbNuits = (int) model.getNb_nuit();
+            double prixTotal = annonce.calculerPrixTotal(nbNuits);
+            reservation.setMontant_paye((long) prixTotal);
+            
+            System.out.println("[ReservationService] Calcul du prix: " + nbNuits + " nuits x " + annonce.getPrix() + "€ = " + prixTotal + "€");
+            
+            // Envoi de l'email
             emailService.SendSimpleMessage(
                     annonceur.getEmail(),
                     "Nouvelle réservation pour votre annonce",
                     "Bonjour,\n\n" +
-                            "Nous vous informons que votre annonce \"" + annonce.get().getTitre() + "\" a été réservée. " +
+                            "Nous vous informons que votre annonce \"" + annonce.getTitre() + "\" a été réservée.\n" +
+                            "Prix total: " + prixTotal + "€\n\n" +
                             "Veuillez consulter votre profil pour confirmer la réservation.\n\n" +
                             "Cordialement,\n" +
                             "L'équipe de gestion des réservations"
