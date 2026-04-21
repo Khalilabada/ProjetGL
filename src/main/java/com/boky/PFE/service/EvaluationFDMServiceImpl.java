@@ -4,22 +4,26 @@ import com.boky.PFE.Beans.SaveEvaluationFDM;
 import com.boky.PFE.entite.EvaluationFDM;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.EvaluationFDMRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 @Service
-public class EvaluationFDMServiceImpl implements EvaluationFDMService
-{
-    @Autowired
-    EvaluationFDMRepository evaluationFDMRepository;
-    @Autowired
-    UtilisateurService utilisateurService;
+public class EvaluationFDMServiceImpl implements EvaluationFDMService {
 
-    @Autowired
-    NotificationService notificationService;
+    private final EvaluationFDMRepository evaluationFDMRepository;
+    private final UtilisateurService utilisateurService;
+    private final NotificationService notificationService;
+
+    public EvaluationFDMServiceImpl(
+            EvaluationFDMRepository evaluationFDMRepository,
+            UtilisateurService utilisateurService,
+            NotificationService notificationService) {
+        this.evaluationFDMRepository = evaluationFDMRepository;
+        this.utilisateurService = utilisateurService;
+        this.notificationService = notificationService;
+    }
     @Override
     public EvaluationFDM AjouterEvaluationFDM(SaveEvaluationFDM model){
         EvaluationFDM evaluation = SaveEvaluationFDM.toEntity(model);

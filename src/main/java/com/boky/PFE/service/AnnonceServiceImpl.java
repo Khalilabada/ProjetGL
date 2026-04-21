@@ -4,19 +4,28 @@ import com.boky.PFE.entite.Annonce;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.AnnonceRepository;
 import com.boky.PFE.repository.UtilisateurRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
 @Service
-public class AnnonceServiceImpl implements AnnonceService
-{
-    @Autowired
-    AnnonceRepository annonceRepository;
-    @Autowired
-    UtilisateurRepository utilisateurRepository;
+public class AnnonceServiceImpl implements AnnonceService {
+
+    private final AnnonceRepository annonceRepository;
+    private final UtilisateurRepository utilisateurRepository;
+    private final NotificationService notificationService;
+
+    public AnnonceServiceImpl(
+            AnnonceRepository annonceRepository,
+            UtilisateurRepository utilisateurRepository,
+            NotificationService notificationService) {
+        this.annonceRepository = annonceRepository;
+        this.utilisateurRepository = utilisateurRepository;
+        this.notificationService = notificationService;
+    }
+
     @Override
     public Annonce AjouterAnnonce(SaveAnnonce model) {
         Annonce annonce = SaveAnnonce.toEntity(model);
@@ -32,9 +41,6 @@ public class AnnonceServiceImpl implements AnnonceService
             return null; // Ou lancer une exception, selon le cas
         }
     }
-
-    @Autowired
-    NotificationService notificationService;
 
     @Override
     public Annonce ModifierAnnonce(Annonce annonce) {

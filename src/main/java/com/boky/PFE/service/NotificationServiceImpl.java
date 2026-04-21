@@ -6,7 +6,6 @@ import com.boky.PFE.entite.Planification;
 import com.boky.PFE.entite.Reservation;
 import com.boky.PFE.entite.ReservationFM;
 import com.boky.PFE.entite.Utilisateur;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +13,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final EmailService emailService;
 
-    @Autowired
     public NotificationServiceImpl(EmailService emailService) {
         this.emailService = emailService;
     }

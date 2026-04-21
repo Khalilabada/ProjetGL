@@ -5,7 +5,6 @@ import com.boky.PFE.entite.Annonce;
 import com.boky.PFE.entite.Evaluation;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.EvaluationRepositrory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,16 +13,23 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 @Service
-public class EvaluationServiceImpl implements EvaluationService
-{
-    @Autowired
-    EvaluationRepositrory evaluationRepositrory;
-    @Autowired
-    AnnonceService annonceService;
-    @Autowired
-    UtilisateurService utilisateurService;
-    @Autowired
-    NotificationService notificationService;
+public class EvaluationServiceImpl implements EvaluationService {
+
+    private final EvaluationRepositrory evaluationRepositrory;
+    private final AnnonceService annonceService;
+    private final UtilisateurService utilisateurService;
+    private final NotificationService notificationService;
+
+    public EvaluationServiceImpl(
+            EvaluationRepositrory evaluationRepositrory,
+            AnnonceService annonceService,
+            UtilisateurService utilisateurService,
+            NotificationService notificationService) {
+        this.evaluationRepositrory = evaluationRepositrory;
+        this.annonceService = annonceService;
+        this.utilisateurService = utilisateurService;
+        this.notificationService = notificationService;
+    }
     @Override
     public Evaluation AjouterEvaluation(SaveEvaluation model){
         Evaluation evaluation = SaveEvaluation.toEntity(model);

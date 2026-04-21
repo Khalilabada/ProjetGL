@@ -3,7 +3,6 @@ package com.boky.PFE.service;
 import com.boky.PFE.Beans.SavereservationFM;
 import com.boky.PFE.entite.*;
 import com.boky.PFE.repository.ReservationFMRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,17 +12,22 @@ import java.util.Optional;
 
 @Service
 public class ReservationFMServiceImpl implements ReservationFMService {
-    @Autowired
-    PlanificationService planificationService;
 
-    @Autowired
-    UtilisateurService utilisateurService;
+    private final PlanificationService planificationService;
+    private final UtilisateurService utilisateurService;
+    private final ReservationFMRepository reservationFMRepository;
+    private final NotificationService notificationService;
 
-    @Autowired
-    ReservationFMRepository reservationFMRepository;
-
-    @Autowired
-    NotificationService notificationService;
+    public ReservationFMServiceImpl(
+            PlanificationService planificationService,
+            UtilisateurService utilisateurService,
+            ReservationFMRepository reservationFMRepository,
+            NotificationService notificationService) {
+        this.planificationService = planificationService;
+        this.utilisateurService = utilisateurService;
+        this.reservationFMRepository = reservationFMRepository;
+        this.notificationService = notificationService;
+    }
 
     @Override
     public ReservationFM AjouterReservationFM(SavereservationFM model) {
