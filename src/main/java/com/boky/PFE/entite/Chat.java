@@ -3,6 +3,9 @@ package com.boky.PFE.entite;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Table(name="chats")
@@ -18,7 +21,7 @@ public class Chat {
     private String emailSecondeUser ;
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Message> messageList;
+    private List<Message> messageList = new ArrayList<>();
 
     public Chat() {
     }
@@ -73,11 +76,19 @@ public class Chat {
     }
 
     public List<Message> getMessageList() {
-        return messageList;
+        return Collections.unmodifiableList(messageList);
     }
 
-    public void setMessageList(List<Message> messageList) {
-        this.messageList = messageList;
+    public void addMessage(Message message) {
+        if (message == null) {
+            throw new IllegalArgumentException("Message must not be null");
+        }
+
+        message.setChat(this);
+        if (message.getTime() == null) {
+            message.setTime(new Date());
+        }
+        messageList.add(message);
     }
 }
 

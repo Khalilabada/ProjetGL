@@ -10,7 +10,6 @@ import com.boky.PFE.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -122,20 +121,16 @@ System.out.println("chat hathy "+ chat);
 
     @Override
     public Chat addMessage(Message add, int chatId) throws ChatNotFoundException {
-        Optional<Chat> chat=chatRepository.findById(chatId);
-        Chat abc=chat.get();
+        Optional<Chat> optChat = chatRepository.findById(chatId);
 
-        if(abc.getMessageList()==null){
-            List<Message> msg=new ArrayList<>();
-            msg.add(add);
-            abc.setMessageList(msg);
-            return chatRepository.save(abc);
-        }else{
-            List<Message> rates=abc.getMessageList();
-            rates.add(add);
-            abc.setMessageList(rates);
-            return chatRepository.save(abc);
+        if (optChat.isEmpty()) {
+            throw new ChatNotFoundException();
         }
+
+        Chat chat = optChat.get();
+        chat.addMessage(add);
+
+        return chatRepository.save(chat);
     }
 
 
