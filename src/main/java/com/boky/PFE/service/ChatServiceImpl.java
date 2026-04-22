@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ChatServiceImpl implements ChatService {
+public class ChatServiceImpl implements ChatCreation, ChatFinder, ChatMessages {
 
     @Autowired
     private ChatRepository chatRepository;
