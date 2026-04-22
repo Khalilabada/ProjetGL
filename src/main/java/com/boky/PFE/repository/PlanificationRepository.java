@@ -7,7 +7,9 @@ import java.util.List;
 
 public interface PlanificationRepository extends JpaRepository<Planification,Long> {
 
-
-
     List<Planification> findByFdmId(Long id);
+
+    long countByFdmIdAndJour(Long fdmId, String jour);
+
+    long countByFdmIdAndJourAndIdNot(Long fdmId, String jour, Long id);
 }

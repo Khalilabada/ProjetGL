@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +18,8 @@ public class Planification
     private String gouvernorat;
     private String adresse;
     private String prixParHeure;
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "fdm_id", nullable = false)
     Utilisateur fdm;
 
     public Long getId() {

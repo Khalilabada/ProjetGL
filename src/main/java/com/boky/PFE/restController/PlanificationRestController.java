@@ -4,6 +4,7 @@ import com.boky.PFE.Beans.SavePlanification;
 import com.boky.PFE.entite.Planification;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.service.PlanificationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class PlanificationRestController {
     // PlanificationRepository SUPPRIMÉ — n'appartient pas à cette couche
 
     @RequestMapping(method = RequestMethod.POST)
-    public Planification AjouterPlanification(@RequestBody SavePlanification model) {
+    public Planification AjouterPlanification(@Valid @RequestBody SavePlanification model) {
         return planificationService.AjouterPlanification(model);
     }
 

@@ -1,19 +1,24 @@
 package com.boky.PFE.Beans;
 
-
 import com.boky.PFE.entite.Planification;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 
 
 public class SavePlanification
 {
-
     private Long id;
+    @NotBlank(message = "L'heure disponible est obligatoire.")
     private String heureDisponible;
+    @NotBlank(message = "Le jour est obligatoire.")
     private String jour;
     private String adresse;
+    @NotBlank(message = "Le prix par heure est obligatoire.")
     private String prixParHeure;
     private String gouvernorat;
+    @Min(value = 1, message = "L'identifiant du formateur (FDM) doit être valide.")
     private long id_fdm;
+
     public static Planification toEntity(SavePlanification model) {
         if (model == null) {
             return null;
