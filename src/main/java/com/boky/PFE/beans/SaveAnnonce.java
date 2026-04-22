@@ -13,7 +13,7 @@ public class SaveAnnonce {
     private int nb_chamber;
     private int nb_lits;
     private int nb_salles;
-    private List<String> equipement; // Changez le type de données en List<String>
+    private List<String> equipement; 
 
     @ElementCollection
     private List<String> equipement_specail;

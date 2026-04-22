@@ -29,28 +29,28 @@ public class EvaluationServiceImpl implements EvaluationService
     @Override
     public Evaluation AjouterEvaluation(SaveEvaluation model){
         Evaluation evaluation = SaveEvaluation.toEntity(model);
-        Optional<Annonce> annonce = annonceService.getAnnonceById(model.getId_annonce());
-        Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_client());
-        Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
+        
+        Annonce annonce = annonceService.getAnnonceById(model.getId_annonce())
+                .orElseThrow(() -> new NoSuchElementException("Annonce non trouvée avec l'id: " + model.getId_annonce()));
+                
+        Utilisateur utilisateur = utilisateurService.getUtilisateurById(model.getId_client())
+                .orElseThrow(() -> new NoSuchElementException("Utilisateur non trouvé avec l'id: " + model.getId_client()));
+                
+        Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.getId());
 
-        if (annonce.isPresent() && utilisateur.isPresent()) {
+        evaluation.setAnnonce(annonce);
+        evaluation.setUtilisateur(utilisateur);
+        emailService.SendSimpleMessage(
+                annonceur.getEmail(),
+                "Nouveau commentaire sur votre annonce",
+                "Bonjour,\n\n" +
+                        "Nous vous informons qu'un nouveau commentaire a été laissé sur votre annonce \"" + annonce.getTitre() + "\". " +
+                        "Veuillez consulter votre profil pour lire et répondre au commentaire.\n\n" +
+                        "Cordialement,\n" +
+                        "L'équipe de gestion des annonces"
+        );
 
-            evaluation.setAnnonce(annonce.get());
-            evaluation.setUtilisateur(utilisateur.get());
-            emailService.SendSimpleMessage(
-                    annonceur.getEmail(),
-                    "Nouveau commentaire sur votre annonce",
-                    "Bonjour,\n\n" +
-                            "Nous vous informons qu'un nouveau commentaire a été laissé sur votre annonce \"" + annonce.get().getTitre() + "\". " +
-                            "Veuillez consulter votre profil pour lire et répondre au commentaire.\n\n" +
-                            "Cordialement,\n" +
-                            "L'équipe de gestion des annonces"
-            );
-
-            return evaluationRepositrory.save(evaluation);}
-        else{
-            return null;}
-
+        return evaluationRepositrory.save(evaluation);
     }
 
     @Override
@@ -65,13 +65,15 @@ public class EvaluationServiceImpl implements EvaluationService
 
     @Override
     public Utilisateur ClientByEvaluation(Long id) {
-        Optional<Evaluation> evaluation =  evaluationRepositrory.findById(id);
-        return evaluation.get().getUtilisateur();
+        Evaluation evaluation = evaluationRepositrory.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Evaluation non trouvée avec l'id: " + id));
+        return evaluation.getUtilisateur();
     }
     @Override
     public Annonce AnnonceByEvaluation(Long id) {
-        Optional<Evaluation> evaluation =  evaluationRepositrory.findById(id);
-        return evaluation.get().getAnnonce();
+        Evaluation evaluation = evaluationRepositrory.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Evaluation non trouvée avec l'id: " + id));
+        return evaluation.getAnnonce();
     }
 
     @Override

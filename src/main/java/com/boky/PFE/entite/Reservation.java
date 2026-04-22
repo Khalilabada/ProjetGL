@@ -30,9 +30,8 @@ public class Reservation
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd ");
         this.date = now.format(formatter);
-        this.etat=false;
-        this.confirmation=false;
-
+        this.etat = false;
+        this.confirmation = false;
     }
 
     public boolean isConfirmation() {
