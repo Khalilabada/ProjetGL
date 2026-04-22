@@ -28,20 +28,51 @@ public class ReservationServiceImpl implements  ReservationService
     ReservationNotificationService notificationService;
     @Override
     public Reservation AjouterReservation(ReservationRQ model){
+        // CONTRAT D'OPÉRATION : Précondition
+        if (model == null || model.getId_annonce() <= 0 || model.getId_client()<= 0) {
+            throw new IllegalArgumentException("Les données de la requête sont incomplètes (Precondition OCL)");
+        }
         Reservation reservation = ReservationRQ.toEntity(model);
         Optional<Annonce> annonce = annonceService.getAnnonceById(model.getId_annonce());
         Optional<Utilisateur> utilisateur = utilisateurService.getUtilisateurById(model.getId_client());
         System.out.println("====== DEBUG ======");
         System.out.println("ID_ANN: " + model.getId_annonce() + ", Present? " + annonce.isPresent());
         System.out.println("ID_CLI: " + model.getId_client() + ", Present? " + utilisateur.isPresent());
-        Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
+
 
         if (annonce.isPresent() && utilisateur.isPresent()) {
+            Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.get().getId());
+            if (!utilisateur.get().isEtat()) {
+                throw new IllegalStateException("Seul un utilisateur actif peut effectuer une réservation");
+            }
+
+            // Contrainte de realtion : Multiplicité logique (annoncea ctive)
+            if (!annonce.get().isEtat()) {
+                throw new IllegalStateException("L'annonce n'est plus disponible pour une réservation");
+            }
+
+            // Contrainte de relation: pasAuto-réservation
+            if (utilisateur.get().getId().equals(annonceur.getId())) {
+                throw new IllegalStateException("Violation OCL : Un propriétaire ne peut pas réserver sa propre annonce");
+            }
+
+            // Invariants sur les attributs
+            if (reservation.getNb_vacancier() <= 0) {
+                throw new IllegalArgumentException("Le nombre de vacanciers doit être strictement positif");
+            }
+
+            if (reservation.getDate_arrivee().compareTo(reservation.getDate_depart()) >= 0) {
+                throw new IllegalArgumentException("La date d'arrivée doit être inferieur à la date de départ");
+            }
+
+            // Contrainte postcondition:
+            float montantAttendu = annonce.get().getPrix() * reservation.getNb_nuit();
+            reservation.setMontant_paye((long) montantAttendu);
 
             reservation.setAnnonce(annonce.get());
             reservation.setUtilisateur(utilisateur.get());
 
-            // SRP
+            // SRP     //  CONTRAT D'OPÉRATION : Postcondition (SRP)
             notificationService.notifierNouvelleReservation(reservation);
 
             return reservationRepository.save(reservation);}
