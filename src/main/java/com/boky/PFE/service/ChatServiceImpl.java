@@ -1,94 +1,96 @@
 package com.boky.PFE.service;
 
-
 import com.boky.PFE.entite.Chat;
 import com.boky.PFE.entite.Message;
 import com.boky.PFE.exceptions.ChatNotFoundException;
 import com.boky.PFE.exceptions.NoChatExistsInTheRepository;
-import com.boky.PFE.repository.ChatRepository;
-import com.boky.PFE.repository.MessageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 public class ChatServiceImpl implements ChatCreation, ChatFinder, ChatMessages {
 
-    @Autowired
-    private ChatRepository chatRepository;
+    private final ChatDataSource chatDataSource;
+    private final MessageDataSource messageDataSource;
 
-    @Autowired
-    private MessageRepository messageRepository;
+    public ChatServiceImpl(ChatDataSource chatDataSource, MessageDataSource messageDataSource) {
+        this.chatDataSource = chatDataSource;
+        this.messageDataSource = messageDataSource;
+    }
 
+    // ── ChatCreation ──────────────────────────────────────────────────────────
+
+    @Override
     public Chat addChat(Chat chat) {
-        return chatRepository.save(chat);
+        return chatDataSource.save(chat);
+    }
+
+    @Override
+    public Chat addMessage(Message add, int chatId) throws ChatNotFoundException {
+        Optional<Chat> optChat = chatDataSource.findById(chatId);
+
+        if (optChat.isEmpty()) {
+            throw new ChatNotFoundException();
+        }
+
+        Chat chat = optChat.get();
+        chat.addMessage(add);
+
+        return chatDataSource.save(chat);
     }
 
     @Override
     public Message addMessage2(Message message) {
-        return messageRepository.save(message);
+        return messageDataSource.save(message);
     }
 
-    @Override
-    public List<Message> getAllMessagesInChat(int chatId) throws NoChatExistsInTheRepository {
-        Optional<Chat> chat = chatRepository.findById(chatId);
+    // ── ChatFinder ────────────────────────────────────────────────────────────
 
-        if(chat.isEmpty()){
-            throw new NoChatExistsInTheRepository();
-        }else {
-            return chat.get().getMessageList();
+    @Override
+    public Chat getById(int id) throws ChatNotFoundException {
+        Optional<Chat> chat = chatDataSource.findById(id);
+        if (chat.isPresent()) {
+            return chat.get();
+        } else {
+            throw new ChatNotFoundException();
         }
     }
 
     @Override
     public List<Chat> findallchats() throws NoChatExistsInTheRepository {
-        if (chatRepository.findAll().isEmpty()) {
+        List<Chat> all = chatDataSource.findAll();
+        if (all.isEmpty()) {
             throw new NoChatExistsInTheRepository();
-        } else {
-            return chatRepository.findAll();
         }
-
-    }
-
-    @Override
-    public Chat getById(int id) throws ChatNotFoundException {
-        Optional<Chat> chatid = chatRepository.findById(id);
-        if (chatid.isPresent()) {
-            return chatid.get();
-        } else {
-            throw new ChatNotFoundException();
-        }
+        return all;
     }
 
     @Override
     public HashSet<Chat> getChatByFirstUserName(String username) throws ChatNotFoundException {
-
-        HashSet<Chat> chat = chatRepository.getChatByEmailfirstUserName(username);
-
+        HashSet<Chat> chat = chatDataSource.findByFirstUserName(username);
         if (chat.isEmpty()) {
             throw new ChatNotFoundException();
-        } else {
-            return chat;
         }
+        return chat;
     }
 
     @Override
     public HashSet<Chat> getChatBySecondUserName(String username) throws ChatNotFoundException {
-        HashSet<Chat> chat = chatRepository.getChatByEmailSecondeUser(username);
+        HashSet<Chat> chat = chatDataSource.findBySecondUserName(username);
         if (chat.isEmpty()) {
             throw new ChatNotFoundException();
-        } else {
-            return chat;
         }
+        return chat;
     }
 
     @Override
     public HashSet<Chat> getChatByFirstUserNameOrSecondUserName(String username) throws ChatNotFoundException {
-        HashSet<Chat> chat = chatRepository.getChatByEmailfirstUserName(username);
-        HashSet<Chat> chat1 = chatRepository.getChatByEmailSecondeUser(username);
+        HashSet<Chat> chat  = chatDataSource.findByFirstUserName(username);
+        HashSet<Chat> chat1 = chatDataSource.findBySecondUserName(username);
 
         chat1.addAll(chat);
 
@@ -102,11 +104,13 @@ public class ChatServiceImpl implements ChatCreation, ChatFinder, ChatMessages {
     }
 
     @Override
-    public Chat getChatByFirstUserNameAndSecondUserName(String firstUserName, String secondUserName) throws ChatNotFoundException {
-        HashSet<Chat> chat = chatRepository.getChatByEmailfirstUserNameAndEmailSecondeUser(firstUserName, secondUserName);
-        HashSet<Chat> chat1 = chatRepository.getChatByEmailSecondeUserAndEmailfirstUserName(firstUserName, secondUserName);
-System.out.println("chat hathy "+ chat);
-        System.out.println("chat1 hathy "+ chat1);
+    public Chat getChatByFirstUserNameAndSecondUserName(String firstUserName, String secondUserName)
+            throws ChatNotFoundException {
+
+        HashSet<Chat> chat  = chatDataSource.findByUsers(firstUserName, secondUserName);
+        HashSet<Chat> chat1 = chatDataSource.findByUsersReversed(firstUserName, secondUserName);
+        System.out.println("chat hathy " + chat);
+        System.out.println("chat1 hathy " + chat1);
 
         if (chat.isEmpty() && chat1.isEmpty()) {
             throw new ChatNotFoundException();
@@ -119,20 +123,16 @@ System.out.println("chat hathy "+ chat);
         }
     }
 
+    // ── ChatMessages ──────────────────────────────────────────────────────────
+
     @Override
-    public Chat addMessage(Message add, int chatId) throws ChatNotFoundException {
-        Optional<Chat> optChat = chatRepository.findById(chatId);
+    public List<Message> getAllMessagesInChat(int chatId) throws NoChatExistsInTheRepository {
+        Optional<Chat> chat = chatDataSource.findById(chatId);
 
-        if (optChat.isEmpty()) {
-            throw new ChatNotFoundException();
+        if (chat.isEmpty()) {
+            throw new NoChatExistsInTheRepository();
+        } else {
+            return chat.get().getMessageList();
         }
-
-        Chat chat = optChat.get();
-        chat.addMessage(add);
-
-        return chatRepository.save(chat);
     }
-
-
-
 }
