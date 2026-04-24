@@ -1,0 +1,27 @@
+package ReservationPlatform
+
+context Evaluation
+inv ValiditeComportementale:
+    let reservationsValides : Set(Reservation) =
+        self.annonce.reservations->select(r |
+            r.utilisateur = self.utilisateur and
+            r.confirmation = true and
+            r.etat = true
+        )
+    in
+        reservationsValides->exists(r |
+            self.dateEpochDay >= r.dateDepartEpochDay and
+            self.dateEpochDay <= r.dateDepartEpochDay + 7
+        )
+        and
+        self.annonce.evaluations->select(e |
+            e.utilisateur = self.utilisateur
+        )->size() = 1
+        and
+        self.utilisateur <> self.annonce.annonceur
+        and
+        not self.commentaire.oclIsUndefined()
+        and
+        self.commentaire <> ''
+
+endpackage

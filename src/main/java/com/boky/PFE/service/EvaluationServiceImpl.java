@@ -1,16 +1,16 @@
 package com.boky.PFE.service;
 
-import com.boky.PFE.Beans.ReservationRQ;
 import com.boky.PFE.Beans.SaveEvaluation;
 import com.boky.PFE.entite.Annonce;
+import com.boky.PFE.entite.Annonceur;
 import com.boky.PFE.entite.Evaluation;
 import com.boky.PFE.entite.Reservation;
 import com.boky.PFE.entite.Utilisateur;
 import com.boky.PFE.repository.EvaluationRepositrory;
+import com.boky.PFE.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,20 +26,40 @@ public class EvaluationServiceImpl implements EvaluationService
     UtilisateurService utilisateurService;
     @Autowired
     EmailService emailService;
+    @Autowired
+    ReservationRepository reservationRepository;
+    @Autowired
+    OclEvaluationValidator oclEvaluationValidator;
+
     @Override
     public Evaluation AjouterEvaluation(SaveEvaluation model){
         Evaluation evaluation = SaveEvaluation.toEntity(model);
-        
+
         Annonce annonce = annonceService.getAnnonceById(model.getId_annonce())
                 .orElseThrow(() -> new NoSuchElementException("Annonce non trouvée avec l'id: " + model.getId_annonce()));
-                
+
         Utilisateur utilisateur = utilisateurService.getUtilisateurById(model.getId_client())
                 .orElseThrow(() -> new NoSuchElementException("Utilisateur non trouvé avec l'id: " + model.getId_client()));
-                
-        Utilisateur annonceur = annonceService.UtilisateurByAnnonceur(annonce.getId());
+
+        Annonceur annonceur = annonceService.UtilisateurByAnnonceur(annonce.getId());
 
         evaluation.setAnnonce(annonce);
         evaluation.setUtilisateur(utilisateur);
+
+        List<Reservation> reservationsAnnonce = reservationRepository.findByAnnonceId(annonce.getId());
+        List<Evaluation> evaluationsAnnonce = evaluationRepositrory.findByannonceId(annonce.getId());
+      try {
+    oclEvaluationValidator.validate(
+            evaluation,
+            annonce,
+            annonceur,
+            reservationsAnnonce,
+            evaluationsAnnonce
+    );
+} catch (ValidationException e) {
+    throw new RuntimeException(e.getMessage());
+}
+
         emailService.SendSimpleMessage(
                 annonceur.getEmail(),
                 "Nouveau commentaire sur votre annonce",
@@ -107,3 +127,4 @@ public class EvaluationServiceImpl implements EvaluationService
     }
 
 }
+ 
