@@ -17,4 +17,7 @@ public interface UtilisateurService {
     List<Utilisateur> getUtilisateurByRole(String role);
     ResponseEntity<?> ConfirmationEmail (String confirmationEmail);
 
+    
+    Utilisateur findByEmail(String email);
+
 }

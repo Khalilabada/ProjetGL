@@ -112,8 +112,13 @@ public class UtilisateurServiceImpl implements UtilisateurService
         return ResponseEntity.badRequest().body("Error: Couldn't verify email");
     }
     @Override
-public List<Utilisateur> getUtilisateurByRole(String role) {
-    return utilisateurRepository.findUtilisateursByRole(role);
-}
+    public List<Utilisateur> getUtilisateurByRole(String role) {
+        return utilisateurRepository.findUtilisateursByRole(role);
+    }
+
+    @Override
+    public Utilisateur findByEmail(String email) {
+        return utilisateurRepository.findByEmail(email);
+    }
 
 }

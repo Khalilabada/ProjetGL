@@ -4,6 +4,7 @@ import com.boky.PFE.entite.Chat;
 import com.boky.PFE.entite.Message;
 import com.boky.PFE.exceptions.ChatNotFoundException;
 import com.boky.PFE.exceptions.NoChatExistsInTheRepository;
+import com.boky.PFE.util.ChatOCLValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -16,21 +17,29 @@ public class ChatServiceImpl implements ChatCreation, ChatFinder, ChatMessages {
 
     private final ChatDataSource chatDataSource;
     private final MessageDataSource messageDataSource;
+    private final ChatOCLValidator oclValidator;
 
-    public ChatServiceImpl(ChatDataSource chatDataSource, MessageDataSource messageDataSource) {
+    public ChatServiceImpl(ChatDataSource chatDataSource, 
+                           MessageDataSource messageDataSource,
+                           ChatOCLValidator oclValidator) {
         this.chatDataSource = chatDataSource;
         this.messageDataSource = messageDataSource;
+        this.oclValidator = oclValidator;
     }
 
     // ── ChatCreation ──────────────────────────────────────────────────────────
 
     @Override
     public Chat addChat(Chat chat) {
+        oclValidator.validateChat(chat);
+        oclValidator.validateChatUsersActive(chat);
         return chatDataSource.save(chat);
     }
 
     @Override
     public Chat addMessage(Message add, int chatId) throws ChatNotFoundException {
+        oclValidator.validateAddMessagePreconditions(add);
+
         Optional<Chat> optChat = chatDataSource.findById(chatId);
 
         if (optChat.isEmpty()) {
@@ -38,13 +47,19 @@ public class ChatServiceImpl implements ChatCreation, ChatFinder, ChatMessages {
         }
 
         Chat chat = optChat.get();
+        int sizeBefore = chat.getMessageList().size();
+        
         chat.addMessage(add);
+        
+        oclValidator.validateAddMessagePostconditions(chat, add, sizeBefore);
+        oclValidator.validateMessageFull(add);
 
         return chatDataSource.save(chat);
     }
 
     @Override
     public Message addMessage2(Message message) {
+        oclValidator.validateMessageFull(message);
         return messageDataSource.save(message);
     }
 
