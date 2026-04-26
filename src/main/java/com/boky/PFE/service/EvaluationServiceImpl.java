@@ -48,17 +48,15 @@ public class EvaluationServiceImpl implements EvaluationService
 
         List<Reservation> reservationsAnnonce = reservationRepository.findByAnnonceId(annonce.getId());
         List<Evaluation> evaluationsAnnonce = evaluationRepositrory.findByannonceId(annonce.getId());
-      try {
-    oclEvaluationValidator.validate(
-            evaluation,
-            annonce,
-            annonceur,
-            reservationsAnnonce,
-            evaluationsAnnonce
-    );
-} catch (ValidationException e) {
-    throw new RuntimeException(e.getMessage());
-}
+ oclEvaluationValidator.validateBeforeSave(
+    evaluation,
+    annonce,
+    annonceur,
+    reservationsAnnonce,
+    evaluationsAnnonce
+);
+   
+
 
         emailService.SendSimpleMessage(
                 annonceur.getEmail(),

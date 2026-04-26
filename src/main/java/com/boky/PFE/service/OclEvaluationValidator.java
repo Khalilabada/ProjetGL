@@ -133,6 +133,59 @@ public class OclEvaluationValidator {
             List<Reservation> reservationsAnnonce,
             List<Evaluation> evaluationsAnnonce
     ) {
+        
+        if (evaluation.getCommentaire() == null
+                || evaluation.getCommentaire().trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "Le commentaire est obligatoire pour publier une évaluation."
+            );
+        }
+
+        if (evaluation.getUtilisateur().getId()
+                .equals(annonceur.getId())) {
+            throw new IllegalArgumentException(
+                "Vous ne pouvez pas évaluer votre propre annonce."
+            );
+        }
+
+        boolean dejaEvalue = evaluationsAnnonce.stream()
+                .anyMatch(e -> e.getUtilisateur().getId()
+                    .equals(evaluation.getUtilisateur().getId()));
+        if (dejaEvalue) {
+            throw new IllegalArgumentException(
+                "Vous avez déjà laissé une évaluation pour cette annonce."
+            );
+        }
+
+        boolean reservationValide = reservationsAnnonce.stream()
+                .anyMatch(r ->
+                    r.getUtilisateur().getId()
+                        .equals(evaluation.getUtilisateur().getId())
+                    && r.isConfirmation()
+                    && r.isEtat()
+                );
+        if (!reservationValide) {
+            throw new IllegalArgumentException(
+                "Vous devez avoir effectué un séjour confirmé pour évaluer."
+            );
+        }
+
+        boolean dansDelai = reservationsAnnonce.stream()
+                .filter(r -> r.getUtilisateur().getId()
+                    .equals(evaluation.getUtilisateur().getId()))
+                .anyMatch(r ->
+                    toEpochDayInt(evaluation.getDate())
+                        >= toEpochDayInt(r.getDate_depart())
+                    && toEpochDayInt(evaluation.getDate())
+                        <= toEpochDayInt(r.getDate_depart()) + 7
+                );
+        if (!dansDelai) {
+            throw new IllegalArgumentException(
+                "Vous ne pouvez évaluer que dans les 7 jours après votre séjour."
+            );
+        }
+
+       
         Map<Long, EObject> utilisateurs = new HashMap<>();
 
         EObject annonceObj = new DynamicEObjectImpl(annonceClass);
@@ -156,9 +209,11 @@ public class OclEvaluationValidator {
         OCL.Query query = ocl.createQuery(evaluationInvariant);
         boolean isValid = query.check(evaluationObj);
         if (!isValid) {
-            throw new IllegalArgumentException("Violation OCL: l'evaluation ne respecte pas ValiditeComportementale.");
+            throw new IllegalArgumentException(
+                "Violation OCL: l'evaluation ne respecte pas ValiditeComportementale."
+            );
         }
-    }
+    }  
 
     private EObject toReservationEObject(Reservation reservation, Map<Long, EObject> utilisateurs) {
         EObject reservationObj = new DynamicEObjectImpl(reservationClass);
@@ -237,7 +292,6 @@ public class OclEvaluationValidator {
         if (rawDate == null || rawDate.trim().isEmpty()) {
             return null;
         }
-
         String value = rawDate.trim();
         for (DateTimeFormatter formatter : DATE_FORMATS) {
             try {
