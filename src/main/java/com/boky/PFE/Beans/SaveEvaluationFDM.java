@@ -14,17 +14,7 @@ public class SaveEvaluationFDM
     private long id_utilisateur;
 
     private long id_FDM;
-    public static EvaluationFDM toEntity(SaveEvaluationFDM model) {
-        if (model == null) {
-            return null;
-        }
-        EvaluationFDM evaluation = new EvaluationFDM();
-        evaluation.setId(model.getId());
-        evaluation.setStar(model.getStar());
-        evaluation.setDate(model.getDate());
-
-        return evaluation;
-    }
+    
 
     public Long getId() {
         return id;
@@ -65,4 +55,10 @@ public class SaveEvaluationFDM
     public void setId_FDM(long id_FDM) {
         this.id_FDM = id_FDM;
     }
+
+    public String getType() {
+        return "NETTOYAGE";
+    }
+
+
 }

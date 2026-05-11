@@ -1,11 +1,14 @@
 package com.boky.PFE.entite;
 
+import com.boky.PFE.Beans.ReservationRQ;
+import com.boky.PFE.Beans.SavereservationFM;
+import com.boky.PFE.factory.reservation.IReservation;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Entity
-public class ReservationFM {
+public class ReservationFM implements IReservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -112,4 +115,44 @@ public class ReservationFM {
 
     public ReservationFM() {
     }
+
+
+    @Override
+    public long getMontantPaye() {
+        return this.montant_paye;
+    }
+
+  
+    @Override
+    public String getType() {
+        return "NETTOYAGE";
+    }
+
+    @Override
+    public String getSujetEmail() {
+        return null;
+    }
+
+    @Override
+    public String getCorpsEmail(String titreAnnonce) {
+        return null;
+    }
+
+
+    @Override
+    public void remplirDepuisFM(SavereservationFM model) {
+        if (model != null) {
+            if (model.getId() != null) {
+                this.id = model.getId();
+            }
+            this.montant_paye = model.getMontant_paye();
+            this.date = model.getDate();
+            this.etat = model.isEtat();
+            this.confirmation = model.isConfirmation();
+
+        }
+    }
+
+
+
 }

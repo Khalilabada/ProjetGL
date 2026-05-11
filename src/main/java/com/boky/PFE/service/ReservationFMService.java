@@ -28,7 +28,7 @@ public interface ReservationFMService {
 
     Client ClientByReservationFM(Long id);
 
-        Planification planificationByReservationFM(Long id);
+    Planification planificationByReservationFM(Long id);
 
 
     ReservationFM ModifierReservationFM(ReservationFM reservationFM);

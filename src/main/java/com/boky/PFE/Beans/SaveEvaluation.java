@@ -13,18 +13,10 @@ public class SaveEvaluation
     private long id_annonce;
 
 
-    public static Evaluation toEntity(SaveEvaluation model) {
-        if (model == null) {
-            return null;
-        }
-        Evaluation evaluation = new Evaluation();
-        evaluation.setId(model.getId());
-        evaluation.setCommentaire(model.getCommentaire());
-        evaluation.setDate(model.getDate());
 
-        return evaluation;
+    public String getType() {
+        return "HEBERGEMENT";
     }
-
     public Long getId() {
         return id;
     }

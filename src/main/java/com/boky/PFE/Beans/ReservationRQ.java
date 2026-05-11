@@ -20,23 +20,7 @@ public class ReservationRQ
     private long id_annonce;
 
 
-    public static Reservation toEntity(ReservationRQ model) {
-        if (model == null) {
-            return null;
-        }
-        Reservation reservation = new Reservation();
-        reservation.setId(model.getId());
-        reservation.setMontant_paye(model.getMontant_paye());
-        reservation.setDate_depart(model.getDate_depart());
-        reservation.setDate_arrivee(model.getDate_arrivee());
-        reservation.setDate(model.getDate());
-        reservation.setNb_nuit(model.getNb_nuit());
-        reservation.setNb_vacancier(model.getNb_vacancier());
-        reservation.setEtat(model.isEtat());
-        reservation.setConfirmation(model.isConfirmation());
-
-        return reservation;
-    }
+   
 
     public boolean isEtat() {
         return etat;
@@ -124,5 +108,9 @@ public class ReservationRQ
 
     public void setId_annonce(long id_annonce) {
         this.id_annonce = id_annonce;
+    }
+
+    public String getType() {
+        return "HEBERGEMENT";
     }
 }

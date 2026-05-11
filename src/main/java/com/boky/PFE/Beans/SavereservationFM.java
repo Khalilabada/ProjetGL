@@ -15,19 +15,7 @@ public class SavereservationFM {
     private long id_planification;
 
 
-    public static ReservationFM toEntity(SavereservationFM model) {
-        if (model == null) {
-            return null;
-        }
-        ReservationFM reservationFM = new ReservationFM();
-        reservationFM.setId(model.getId());
-        reservationFM.setMontant_paye(model.getMontant_paye());
-        reservationFM.setDate(model.getDate());
-        reservationFM.setEtat(model.isEtat());
-        reservationFM.setConfirmation(model.isConfirmation());
-        // Additional fields like id_client and id_fdm can be set here if necessary
-        return reservationFM;
-    }
+    
 
     // Getters and Setters
     public Long getId() {
@@ -85,4 +73,10 @@ public class SavereservationFM {
     public void setId_planification(long id_planification) {
         this.id_planification = id_planification;
     }
+
+
+    public String getType() {
+        return "NETTOYAGE";
+    }
+
 }
