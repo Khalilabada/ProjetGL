@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-@Service
+@Service("annonceServiceImpl")
 public class AnnonceServiceImpl implements AnnonceService
 {
     @Autowired
@@ -31,8 +31,8 @@ public class AnnonceServiceImpl implements AnnonceService
             annonce.setAnnonceur(utilisateur);
             return annonceRepository.save(annonce);
         } else {
-            // Gérer le cas où l'utilisateur n'est pas trouvé
-            return null; // Ou lancer une exception, selon le cas
+
+            return null;
         }
     }
 
