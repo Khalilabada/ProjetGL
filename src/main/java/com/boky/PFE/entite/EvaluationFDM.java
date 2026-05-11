@@ -18,7 +18,7 @@ public class EvaluationFDM
 
     private long Star;
     @ManyToOne
-    Utilisateur utilisateur;
+    Client utilisateur;
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
@@ -27,7 +27,7 @@ public class EvaluationFDM
 
     }
     @ManyToOne
-    Utilisateur fdm;
+    FemmeMenage fdm;
 
     public Long getId() {
         return id;
@@ -53,19 +53,19 @@ public class EvaluationFDM
         Star = star;
     }
 
-    public Utilisateur getUtilisateur() {
+    public Client getUtilisateur() {
         return utilisateur;
     }
 
-    public void setUtilisateur(Utilisateur utilisateur) {
+    public void setUtilisateur(Client utilisateur) {
         this.utilisateur = utilisateur;
     }
 
-    public Utilisateur getFdm() {
+    public FemmeMenage getFdm() {
         return fdm;
     }
 
-    public void setFdm(Utilisateur fdm) {
+    public void setFdm(FemmeMenage fdm) {
         this.fdm = fdm;
     }
 }

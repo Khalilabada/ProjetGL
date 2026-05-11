@@ -46,7 +46,7 @@ public class Annonce {
     private boolean verification;
     private boolean accorde_user;
     @ManyToOne
-    Utilisateur annonceur;
+    Annonceur annonceur;
 
     @PrePersist
     protected void onCreate() {
@@ -76,11 +76,11 @@ public class Annonce {
 
 
 
-    public Utilisateur getAnnonceur() {
+    public Annonceur getAnnonceur() {
         return annonceur;
     }
 
-    public void setAnnonceur(Utilisateur annonceur) {
+    public void setAnnonceur(Annonceur annonceur) {
         this.annonceur = annonceur;
     }
 

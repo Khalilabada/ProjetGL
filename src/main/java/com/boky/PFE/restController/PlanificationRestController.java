@@ -1,7 +1,6 @@
 package com.boky.PFE.restController;
 
 
-import com.boky.PFE.entite.Admin;
 import com.boky.PFE.entite.Annonce;
 import com.boky.PFE.entite.Planification;
 import com.boky.PFE.entite.Utilisateur;

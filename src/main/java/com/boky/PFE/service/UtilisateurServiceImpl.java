@@ -1,7 +1,9 @@
 package com.boky.PFE.service;
 
+import com.boky.PFE.Beans.UtilisateurRequest;
 import com.boky.PFE.entite.ConfirmationToken;
 import com.boky.PFE.entite.Utilisateur;
+import com.boky.PFE.factory.UtilisateurFactoryProvider;
 import com.boky.PFE.repository.ConfirmationTokenRepository;
 import com.boky.PFE.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UtilisateurServiceImpl implements UtilisateurService
@@ -27,6 +30,8 @@ public class UtilisateurServiceImpl implements UtilisateurService
     private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     @Autowired
     EmailUtilisateurService emailUtilisateurService;
+    @Autowired
+    EmailService emailService;
 
     @Override
     public ResponseEntity<Object> AjouterUtilisateur(Utilisateur utilisateur) {
@@ -64,6 +69,53 @@ public class UtilisateurServiceImpl implements UtilisateurService
     @Override
     public Utilisateur ModifierUtilisateur(Utilisateur utilisateur, long id) {
         return utilisateurRepository.save(utilisateur);
+    }
+
+    @Override
+    public Utilisateur modifierDepuisRequete(Long id, UtilisateurRequest request) {
+        Optional<Utilisateur> optional = utilisateurRepository.findById(id);
+        if (optional.isEmpty()) {
+            return null;
+        }
+        Utilisateur u = optional.get();
+        if (!UtilisateurFactoryProvider.typeCorrespondAuCompte(u, request.getType())) {
+            throw new IllegalArgumentException("Le type ne correspond pas a ce compte.");
+        }
+        if (request.getId() != null) {
+            u.setId(request.getId());
+        }
+        if (request.getNom() != null) {
+            u.setNom(request.getNom());
+        }
+        if (request.getPrenom() != null) {
+            u.setPrenom(request.getPrenom());
+        }
+        if (request.getEmail() != null) {
+            u.setEmail(request.getEmail());
+        }
+        if (request.getDate_de_naissance() != null) {
+            u.setDate_de_naissance(request.getDate_de_naissance());
+        }
+        if (request.getTelephone() != null) {
+            u.setTelephone(request.getTelephone());
+        }
+        if (request.getAdresse() != null) {
+            u.setAdresse(request.getAdresse());
+        }
+        if (request.getPhoto() != null) {
+            u.setPhoto(request.getPhoto());
+        }
+        if (request.getMdp() != null && !request.getMdp().isEmpty()) {
+            if (!bCryptPasswordEncoder.matches(request.getMdp(), u.getMdp())) {
+                u.setMdp(bCryptPasswordEncoder.encode(request.getMdp()));
+            }
+        }
+        if (request.isEtat() != u.isEtat()) {
+            String etat = u.isEtat() ? "Bloqué" : "Accepté";
+            emailService.SendSimpleMessage(u.getEmail(), "L'etat de votre compte", "votre compte a été " + etat);
+        }
+        u.setEtat(request.isEtat());
+        return utilisateurRepository.save(u);
     }
 
     @Override
@@ -112,13 +164,15 @@ public class UtilisateurServiceImpl implements UtilisateurService
         return ResponseEntity.badRequest().body("Error: Couldn't verify email");
     }
     @Override
-    public List<Utilisateur> getUtilisateurByRole(String role) {
-        return utilisateurRepository.findUtilisateursByRole(role);
+public List<Utilisateur> getUtilisateurByRole(String role) {
+    if (role == null || role.isBlank()) {
+        return utilisateurRepository.findAll();
     }
 
-    @Override
-    public Utilisateur findByEmail(String email) {
-        return utilisateurRepository.findByEmail(email);
-    }
+    String normalizedRole = role.trim().toLowerCase();
+    return utilisateurRepository.findAll().stream()
+            .filter(utilisateur -> utilisateur.getClass().getSimpleName().toLowerCase().equals(normalizedRole))
+            .collect(Collectors.toList());
+}
 
 }

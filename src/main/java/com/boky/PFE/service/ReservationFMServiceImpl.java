@@ -33,7 +33,10 @@ public class ReservationFMServiceImpl implements ReservationFMService {
         Optional<Utilisateur> utilisateurClient = utilisateurService.getUtilisateurById(model.getId_client());
 
         if (planification.isPresent() && utilisateurClient.isPresent()) {
-            reservationFM.setUtilisateur(utilisateurClient.get());
+            if (!(utilisateurClient.get() instanceof Client client)) {
+                throw new IllegalArgumentException("Le client de reservation doit etre de type Client.");
+            }
+            reservationFM.setUtilisateur(client);
             reservationFM.setPlanification(planification.get());
 
             emailService.SendSimpleMessage(
@@ -67,7 +70,7 @@ public class ReservationFMServiceImpl implements ReservationFMService {
     }
 
     @Override
-    public Utilisateur ClientByReservationFM(Long id) {
+    public Client ClientByReservationFM(Long id) {
         Optional<ReservationFM> reservationFM = reservationFMRepository.findById(id);
         if (reservationFM.isPresent()) {
             return reservationFM.get().getUtilisateur();
@@ -88,7 +91,7 @@ public class ReservationFMServiceImpl implements ReservationFMService {
 
     @Override
     public ReservationFM ModifierReservationFM(ReservationFM reservationFM) {
-        Utilisateur client = this.ClientByReservationFM(reservationFM.getId());
+        Client client = this.ClientByReservationFM(reservationFM.getId());
         Planification planification = this.planificationByReservationFM(reservationFM.getId());
 
         reservationFM.setUtilisateur(client);

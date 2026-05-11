@@ -2,8 +2,8 @@ package com.boky.PFE.service;
 
 import com.boky.PFE.Beans.ReservationRQ;
 import com.boky.PFE.entite.Annonce;
+import com.boky.PFE.entite.Client;
 import com.boky.PFE.entite.Reservation;
-import com.boky.PFE.entite.Utilisateur;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -17,7 +17,7 @@ public interface ReservationService
     List<Reservation> listeReservationByUtilisateur(Long id );
 
 
-    Utilisateur ClientByReservation( Long id);
+    Client ClientByReservation( Long id);
 
     Annonce AnnonceByReservation(Long id);
 

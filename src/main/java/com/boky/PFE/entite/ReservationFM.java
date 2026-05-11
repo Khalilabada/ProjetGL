@@ -15,7 +15,7 @@ public class ReservationFM {
     private boolean confirmation;
 
     @ManyToOne
-    private Utilisateur utilisateur;
+    private Client utilisateur;
 
     @ManyToOne
     private Planification planification;
@@ -70,11 +70,11 @@ public class ReservationFM {
         this.confirmation = confirmation;
     }
 
-    public Utilisateur getUtilisateur() {
+    public Client getUtilisateur() {
         return utilisateur;
     }
 
-    public void setUtilisateur(Utilisateur utilisateur) {
+    public void setUtilisateur(Client utilisateur) {
         this.utilisateur = utilisateur;
     }
 
@@ -88,7 +88,7 @@ public class ReservationFM {
     }
 
     // Constructors
-    public ReservationFM(Long id, long montant_paye, String date, Utilisateur utilisateur, Planification planification) {
+    public ReservationFM(Long id, long montant_paye, String date, Client utilisateur, Planification planification) {
         this.id = id;
         this.montant_paye = montant_paye;
         this.date = date;
@@ -96,13 +96,13 @@ public class ReservationFM {
         this.planification = planification;
     }
 
-    public ReservationFM(long montant_paye, Utilisateur utilisateur, Planification planification) {
+    public ReservationFM(long montant_paye, Client utilisateur, Planification planification) {
         this.montant_paye = montant_paye;
         this.utilisateur = utilisateur;
         this.planification = planification;
     }
 
-    public ReservationFM(long montant_paye, boolean etat, boolean confirmation, Utilisateur utilisateur, Planification planification) {
+    public ReservationFM(long montant_paye, boolean etat, boolean confirmation, Client utilisateur, Planification planification) {
         this.montant_paye = montant_paye;
         this.etat = etat;
         this.confirmation = confirmation;
