@@ -23,7 +23,7 @@ public class ReservationFMServiceImpl implements ReservationFMService {
     ReservationFMRepository reservationFMRepository;
 
     @Autowired
-    EmailService emailService;
+    NotificationService notificationService;
 
     @Override
     public ReservationFM AjouterReservationFM(SavereservationFM model) {
@@ -38,16 +38,7 @@ public class ReservationFMServiceImpl implements ReservationFMService {
             }
             reservationFM.setUtilisateur(client);
             reservationFM.setPlanification(planification.get());
-
-            emailService.SendSimpleMessage(
-                    planification.get().getHeureDisponible(),
-                    "Nouvelle réservation pour votre planning",
-                    "Bonjour,\n\n" +
-                            "Nous vous informons que votre planning a été réservée. " +
-                            "Veuillez consulter votre profil pour confirmer la réservation.\n\n" +
-                            "Cordialement,\n" +
-                            "L'équipe de gestion des réservations"
-            );
+            notificationService.notifyReservationFMCreated(planification.get());
 
             return reservationFMRepository.save(reservationFM);
         } else {
@@ -103,18 +94,7 @@ public class ReservationFMServiceImpl implements ReservationFMService {
         }
 
         reservationFM.setEtat(true);
-
-        String etat = reservationFM.isConfirmation() ? "acceptée" : "non confirmée";
-
-        emailService.SendSimpleMessage(
-                client.getEmail(),
-                "Réponse concernant votre réservation de ménage",
-                "Bonjour,\n\n" +
-                        "Nous souhaitons vous informer que votre réservation pour le service de ménage a été " + etat + " pour la date du " + planification.getJour() + ".\n\n" +
-                        "Merci de consulter votre profil pour plus de détails.\n\n" +
-                        "Cordialement,\n" +
-                        "L'équipe de gestion des réservations"
-        );
+        notificationService.notifyReservationFMResponse(client, planification, reservationFM);
 
         return reservationFMRepository.save(reservationFM);
     }
