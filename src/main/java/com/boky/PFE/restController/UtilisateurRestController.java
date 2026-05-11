@@ -1,7 +1,5 @@
 package com.boky.PFE.restController;
 import com.boky.PFE.Beans.UtilisateurRequest;
-import com.boky.PFE.factory.UtilisateurFactory;
-import com.boky.PFE.factory.UtilisateurFactoryProvider;
 import com.boky.PFE.service.*;
 import com.boky.PFE.util.NewPassword;
 import com.boky.PFE.util.UserCode;
@@ -34,20 +32,13 @@ public class UtilisateurRestController {
     @Autowired
     EmailUtilisateurService emailUtilisateurService;
     private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    UtilisateurApplicationService utilisateurApplicationService;
+
     @PostMapping(value = "/register")
     ResponseEntity<?> AjouterUtilisateur (@RequestBody UtilisateurRequest request)
     {
-        UtilisateurFactory factory = UtilisateurFactoryProvider.getFactory(request.getType());
-        Utilisateur utilisateur = factory.creerUtilisateur();
-        utilisateur.setNom(request.getNom());
-        utilisateur.setPrenom(request.getPrenom());
-        utilisateur.setEmail(request.getEmail());
-        utilisateur.setDate_de_naissance(request.getDate_de_naissance());
-        utilisateur.setTelephone(request.getTelephone());
-        utilisateur.setAdresse(request.getAdresse());
-        utilisateur.setMdp(request.getMdp());
-        utilisateur.setPhoto(request.getPhoto());
-        return utilisateurService.AjouterUtilisateur(utilisateur);
+        return utilisateurApplicationService.register(request);
     }
 
     @Autowired
