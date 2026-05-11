@@ -16,16 +16,12 @@ public class EmailNotificationObserver implements ReservationObserver {
  
  @Override
  public void update(Reservation reservation, String evenementType) {
-     // Ces emails sont DÉJÀ envoyés par l'ancien code
-     // Mais Observer permet d'en ajouter d'autres sans modifier le service
      
      switch(evenementType) {
          case "CREATE":
-             // Email à l'annonceur (déjà fait par l'ancien code)
              System.out.println("[Observer] Notification email pour création");
              break;
          case "CONFIRM":
-             // Email au client (déjà fait par l'ancien code)
              System.out.println("[Observer] Notification email pour confirmation");
              break;
      }
