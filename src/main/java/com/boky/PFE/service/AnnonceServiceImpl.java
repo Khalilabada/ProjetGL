@@ -36,8 +36,8 @@ public class AnnonceServiceImpl implements AnnonceService
         }
     }
 
-@Autowired
-EmailService emailService;
+    @Autowired
+    AnnonceNotificationService notificationService;
     @Override
     public Annonce ModifierAnnonce(Annonce annonce) {
         System.out.println("hatha annonce.getAnnonceur() "+annonce.getAnnonceur());
@@ -52,9 +52,7 @@ EmailService emailService;
 
         Annonce annonce1 = annonceOptional.get();
         if (annonce1.doitNotifierChangementEtat(annonce.isEtat())) {
-            emailService.SendSimpleMessage(annonceur.getEmail(),
-                    "L'etat de votre Annonce " + annonce.getTitre(),
-                    "Votre annonce a été " + annonce1.getTexteEtat(annonce.isEtat()));
+            notificationService.notifierChangementEtat(annonce, annonce1.getTexteEtat(annonce.isEtat()), annonceur.getEmail());
         }
         return annonceRepository.save(annonce);
     }

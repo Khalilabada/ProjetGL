@@ -23,8 +23,9 @@ public class ReservationServiceImpl implements  ReservationService
 
     @Autowired
     ReservationRepository reservationRepository;
+
     @Autowired
-    EmailService emailService;
+    ReservationNotificationService notificationService;
     @Override
     public Reservation AjouterReservation(ReservationRQ model){
         Reservation reservation = ReservationRQ.toEntity(model);
@@ -39,15 +40,9 @@ public class ReservationServiceImpl implements  ReservationService
 
             reservation.setAnnonce(annonce.get());
             reservation.setUtilisateur(utilisateur.get());
-            emailService.SendSimpleMessage(
-                    annonceur.getEmail(),
-                    "Nouvelle réservation pour votre annonce",
-                    "Bonjour,\n\n" +
-                            "Nous vous informons que votre annonce \"" + annonce.get().getTitre() + "\" a été réservée. " +
-                            "Veuillez consulter votre profil pour confirmer la réservation.\n\n" +
-                            "Cordialement,\n" +
-                            "L'équipe de gestion des réservations"
-            );
+
+            // SRP
+            notificationService.notifierNouvelleReservation(reservation);
 
             return reservationRepository.save(reservation);}
         else{
@@ -88,15 +83,11 @@ public class ReservationServiceImpl implements  ReservationService
             throw new NoSuchElementException("Reservation non trouvée avec l'id: " + reservation.getId());
         }
 
-        // GRASP Expert 
+        // GRASP Expert
         reservation.traiter();
 
-        // GRASP Expert
-        emailService.SendSimpleMessage(
-                client.getEmail(),
-                reservation.getSujetNotification(),
-                reservation.getCorpsNotification()
-        );
+       // SRP
+        notificationService.notifierChangementReservation(reservation);
 
         return reservationRepository.save(reservation);
     }

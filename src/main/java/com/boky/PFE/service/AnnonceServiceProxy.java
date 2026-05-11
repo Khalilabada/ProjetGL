@@ -14,12 +14,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * PROXY DE SÉCURITÉ pour AnnonceService.
- * Ce patron de structure contrôle l'accès au service réel.
- */
+
+ //PROXY DE SÉCURITÉ pour AnnonceService.
+ // Ce patron de structure contrôle l'accès au service réel.
+
 @Service
-@Primary // Garantit que ce Proxy est injecté partout à la place de l'implémentation réelle
+@Primary
 public class AnnonceServiceProxy implements AnnonceService {
 
     @Autowired
