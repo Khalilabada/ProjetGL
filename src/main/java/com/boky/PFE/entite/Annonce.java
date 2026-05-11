@@ -264,4 +264,13 @@ public class Annonce {
     public void setHeure_arriver(String heure_arriver) {
         this.heure_arriver = heure_arriver;
     }
+
+    // --- GRASP: Expert en Information ---
+    public boolean doitNotifierChangementEtat(boolean nouvelEtat) {
+        return this.etat != nouvelEtat && this.verification;
+    }
+
+    public String getTexteEtat(boolean nouvelEtat) {
+        return nouvelEtat ? "mise en ligne" : "hors ligne";
+    }
 }

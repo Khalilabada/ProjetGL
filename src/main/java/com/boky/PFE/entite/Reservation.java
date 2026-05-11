@@ -170,4 +170,23 @@ public class Reservation
     public Reservation() {
 
     }
+
+    // --- GRASP: Expert en Information ---
+    public void traiter() {
+        this.etat = true;
+    }
+    public String getTexteConfirmation() {
+        return this.confirmation ? "acceptée" : "non confirmée";
+    }
+    public String getSujetNotification() {
+        return "Réponse concernant votre réservation de maison - " + this.annonce.getTitre();
+    }
+    public String getCorpsNotification() {
+        return "Bonjour,\n\n" +
+                "Nous vous informons que votre réservation pour la maison \"" + this.annonce.getTitre() +
+                "\" a été " + this.getTexteConfirmation() + ".\n\n" +
+                "Merci de consulter votre profil pour plus de détails.\n\n" +
+                "Cordialement,\n" +
+                "L'équipe de gestion des réservations";
+    }
 }
